@@ -1,0 +1,80 @@
+.admin-container {
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+}
+
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.product-form input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.product-form button {
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.product-form button:hover {
+    background: #218838;
+}
+
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.product-table th, .product-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.product-table th {
+    background: #f8f9fa;
+}
+
+.product-table td {
+    text-align: center;
+}
+
+.product-table button {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin: 2px;
+}
+
+.product-table .delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.product-table .delete-btn:hover {
+    background: #c82333;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column; /* Stack label on top of input */
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
