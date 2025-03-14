@@ -1,109 +1,102 @@
 import React, { useEffect, useState } from "react";
-import { getProducts, addProduct, updateProduct, deleteProduct } from "../api/api";
-import "../Styles/adminProducts.css"
+import axios from "axios";  // ✅ Import Axios for API requests
+import "../Styles/adminProducts.css";
+
+const API_URL = "http://localhost:5000/api/products"; // ✅ Update the correct backend URL
 
 const AdminProducts = () => {
     
     const [products, setProducts] = useState([]);
     
-    
+    // New product state
     const [newProduct, setNewProduct] = useState({
-        name: "",
+        productName: "",
         category: "",
         quantity: "",
         expiryDate: "",
         batchNo: "",
     });
 
-    
+    // Editing product state
     const [editingProduct, setEditingProduct] = useState(null);
 
-    // fetch all products from backend
+    // ✅ Fetch Products from Backend
     const fetchProducts = async () => {
         try {
-            const response = await getProducts();
+            const response = await axios.get(API_URL);
             setProducts(response.data);
         } catch (error) {
-            console.error("Error fetching products", error);
+            console.error("Error fetching products:", error);
         }
     };
 
     useEffect(() => {
         fetchProducts();
-    }, [])
+    }, []);
 
-   
+    // ✅ Handle Input Change
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (editingProduct) {
-            setEditingProduct({ ...editingProduct, [name]: value });
-
-        } else {
-            setNewProduct({ ...newProduct, [name]: value });
-        }
+        setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
     };
 
-    
-    const handleAddProduct = async() => {
-        if (!newProduct.name || !newProduct.category || !newProduct.quantity || !newProduct.expiryDate || !newProduct.batchNo) {
+    // ✅ Add Product to Database
+    const handleAddProduct = async () => {
+        if (!newProduct.productName || !newProduct.category || !newProduct.quantity || !newProduct.expiryDate || !newProduct.batchNo) {
             alert("Please fill in all fields.");
             return;
         }
 
         try {
-            await addProduct(newProduct);
-            fetchProducts();
-            setNewProduct({ name: "", category: "", quantity: "", expiryDate: "", batchNo: "" });
+            const response = await axios.post(API_URL, newProduct);
+            setProducts([...products, response.data]); // Update state
+            setNewProduct({ productName: "", category: "", quantity: "", expiryDate: "", batchNo: "" });
         } catch (error) {
             console.error("Error adding product:", error);
         }
     };
 
+    // ✅ Delete Product from Database
+    const handleDeleteProduct = async (id) => {
+        try {
+            await axios.delete(`${API_URL}/${id}`);
+            setProducts(products.filter(product => product._id !== id)); // Update state
+        } catch (error) {
+            console.error("Error deleting product:", error);
+        }
+    };
+
+    // ✅ Edit Product
+    const handleEditProduct = (product) => {
+        setEditingProduct(product);
+    };
+
+    // ✅ Update Product in Database
     const handleUpdateProduct = async () => {
         try {
-            await updateProduct(editingProduct._id, editingProduct);
-            fetchProducts();
+            const response = await axios.put(`${API_URL}/${editingProduct._id}`, editingProduct);
+            setProducts(products.map(prod => (prod._id === editingProduct._id ? response.data : prod))); // Update state
             setEditingProduct(null);
         } catch (error) {
             console.error("Error updating product:", error);
         }
     };
 
-    
-    const handleDeleteProduct = async (id) => {
-        try {
-            await deleteProduct(id);
-            fetchProducts();
-        } catch (error) {
-            console.error("Error deleting products:", error);
-        }
-    };
-
-    
-   
-
     return (
         <div className="admin-container">
             <h2>Admin - Manage Products</h2>
 
-           
+            {/* Add / Edit Form */}
             <div className="product-form">
                 <h3>{editingProduct ? "Edit Product" : "Add New Product"}</h3>
-                <input type="text" name="name" placeholder="Product Name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={handleChange} />
-                <input type="text" name="category" placeholder="Category" value={editingProduct ? editingProduct.category : newProduct.category} onChange={ handleChange} />
-                <input type="number" name="quantity" placeholder="Quantity (Kg)" value={editingProduct ? editingProduct.quantity : newProduct.quantity} onChange={handleChange} />
-                <div className="form-group">
-                    <label htmlFor="expiryDate">Expiry Date:</label>
-                    <input 
-                    type="date" 
-                    id="expiryDate" 
-                    name="expiryDate" 
-                    value={editingProduct ? editingProduct.expiryDate : newProduct.expiryDate} 
-                    onChange={handleChange} 
-                    />
-                </div>
- 
-                <input type="text" name="batchNo" placeholder="Batch Number" value={editingProduct ? editingProduct.batchNo : newProduct.batchNo} onChange={handleChange} />
+                <input type="text" name="productName" placeholder="Product Name" value={editingProduct ? editingProduct.productName : newProduct.productName} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, productName: e.target.value }) : handleChange} />
+                <select name="category" value={editingProduct ? editingProduct.category : newProduct.category} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, category: e.target.value }) : handleChange}>
+                    <option value="">Select Category</option>
+                    <option value="Raw Material">Raw Material</option>
+                    <option value="Finished Product">Finished Product</option>
+                </select>
+                <input type="number" name="quantity" placeholder="Quantity (Kg)" value={editingProduct ? editingProduct.quantity : newProduct.quantity} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, quantity: e.target.value }) : handleChange} />
+                <input type="date" name="expiryDate" value={editingProduct ? editingProduct.expiryDate : newProduct.expiryDate} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, expiryDate: e.target.value }) : handleChange} />
+                <input type="text" name="batchNo" placeholder="Batch Number" value={editingProduct ? editingProduct.batchNo : newProduct.batchNo} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, batchNo: e.target.value }) : handleChange} />
 
                 {editingProduct ? (
                     <button onClick={handleUpdateProduct}>Update Product</button>
@@ -129,13 +122,13 @@ const AdminProducts = () => {
                     {products.length > 0 ? (
                         products.map(product => (
                             <tr key={product._id}>
-                                <td>{product.name}</td>
+                                <td>{product.productName}</td>
                                 <td>{product.category}</td>
                                 <td>{product.quantity}</td>
-                                <td>{product.expiryDate}</td>
+                                <td>{new Date(product.expiryDate).toLocaleDateString()}</td>
                                 <td>{product.batchNo}</td>
                                 <td>
-                                    <button onClick={() => setEditingProduct(product)}>Edit</button>
+                                    <button onClick={() => handleEditProduct(product)}>Edit</button>
                                     <button onClick={() => handleDeleteProduct(product._id)} className="delete-btn">Delete</button>
                                 </td>
                             </tr>
