@@ -23,6 +23,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 const orderRoutes = require('./routes/order');
 app.use('/api/orders', orderRoutes);
 
+const itemRoutes = require('./routes/item');
+app.use('/api/items', itemRoutes);
+
 // Test route
 app.get('/', (req, res) => {
   res.send('Spice Sense API is running...');
