@@ -1,143 +1,181 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";  // ✅ Import Axios for API requests
+import axios from "axios";  
 import "../Styles/adminProducts.css";
 
-const API_URL = "http://localhost:5000/api/products"; // ✅ Update the correct backend URL
+const API_URL = "http://localhost:5000/api/products"; 
+const API_NAMES = "http://localhost:5000/api/products/names";
 
 const AdminProducts = () => {
     
-    const [products, setProducts] = useState([]);
-    
-    // New product state
-    const [newProduct, setNewProduct] = useState({
-        productName: "",
-        category: "",
-        quantity: "",
-        expiryDate: "",
-        batchNo: "",
-    });
+    const [productName, setProductName] = useState("");
+    const [category, setCategory] = useState("Raw Material");
+    const [quantity, setQuantity] = useState("");
+    const [expiryDate, setExpiryDate] = useState("");
+    const [batchNo, setBatchNo] = useState("");
+    const [image, setImage] = useState(null);
+    const [preview, setPreview] = useState("");
+    const [productNames, setProductNames] = useState([]);  // List of product names
+    const [products, setProducts] = useState([]); // List of products
+    const [customProduct, setCustomProduct] = useState(false);
 
-    // Editing product state
-    const [editingProduct, setEditingProduct] = useState(null);
-
-    // ✅ Fetch Products from Backend
-    const fetchProducts = async () => {
-        try {
-            const response = await axios.get(API_URL);
-            setProducts(response.data);
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        }
-    };
-
+    // Fetch existing product names
     useEffect(() => {
-        fetchProducts();
+        axios.get(API_NAMES)
+            .then(response => setProductNames(response.data))
+            .catch(error => console.error("Error fetching product names:", error));
     }, []);
 
-    // ✅ Handle Input Change
-    const handleChange = (e) => {
-        setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+    // Fetch all products
+    useEffect(() => {
+        axios.get(API_URL)
+            .then(response => setProducts(response.data))
+            .catch(error => console.error("Error fetching products:", error));
+    }, []);
+
+    // Handle product name selection
+    const handleProductChange = (e) => {
+        if (e.target.value === "custom") {
+            setCustomProduct(true);
+            setProductName("");
+        } else {
+            setCustomProduct(false);
+            setProductName(e.target.value);
+        }
     };
 
-    // ✅ Add Product to Database
-    const handleAddProduct = async () => {
-        if (!newProduct.productName || !newProduct.category || !newProduct.quantity || !newProduct.expiryDate || !newProduct.batchNo) {
-            alert("Please fill in all fields.");
-            return;
+    // Handle image upload and preview
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        setImage(file);
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => setPreview(reader.result);
+            reader.readAsDataURL(file);
         }
+    };
+
+    // Submit form
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("productName", productName || customProduct);
+        formData.append("category", category);
+        formData.append("quantity", quantity);
+        formData.append("expiryDate", expiryDate);
+        formData.append("batchNo", batchNo);
+        if (image) formData.append("image", image);
 
         try {
-            const response = await axios.post(API_URL, newProduct);
-            setProducts([...products, response.data]); // Update state
-            setNewProduct({ productName: "", category: "", quantity: "", expiryDate: "", batchNo: "" });
+            await axios.post(API_URL, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            alert("Product added successfully!");
+            window.location.reload();
         } catch (error) {
             console.error("Error adding product:", error);
+            alert("Error adding product!");
         }
     };
 
-    // ✅ Delete Product from Database
+    // Delete Product
     const handleDeleteProduct = async (id) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
-            setProducts(products.filter(product => product._id !== id)); // Update state
+            alert("Product deleted successfully!");
+            window.location.reload();
         } catch (error) {
             console.error("Error deleting product:", error);
+            alert("Error deleting product!");
         }
     };
 
-    // ✅ Edit Product
-    const handleEditProduct = (product) => {
-        setEditingProduct(product);
-    };
+    // Edit Product Name
+    const handleEditProduct = async (id) => {
+        const newName = prompt("Enter new product name:");
+        if (!newName) return;
 
-    // ✅ Update Product in Database
-    const handleUpdateProduct = async () => {
         try {
-            const response = await axios.put(`${API_URL}/${editingProduct._id}`, editingProduct);
-            setProducts(products.map(prod => (prod._id === editingProduct._id ? response.data : prod))); // Update state
-            setEditingProduct(null);
+            await axios.put(`${API_URL}/${id}`, { productName: newName });
+            alert("Product updated successfully!");
+            window.location.reload();
         } catch (error) {
             console.error("Error updating product:", error);
+            alert("Error updating product!");
         }
     };
 
     return (
         <div className="admin-container">
-            <h2>Admin - Manage Products</h2>
+            <h2>Manage Products</h2>
+            <form onSubmit={handleSubmit} className="product-form">
+                
+                {/* Product Name Dropdown */}
+                <label>Product Name:</label>
+                <select onChange={handleProductChange} value={productName}>
+                    <option value="">Select a Product</option>
+                    {productNames.map((name, index) => (
+                        <option key={index} value={name}>{name}</option>
+                    ))}
+                    <option value="custom">Add New Product</option>
+                </select>
 
-            {/* Add / Edit Form */}
-            <div className="product-form">
-                <h3>{editingProduct ? "Edit Product" : "Add New Product"}</h3>
-                <input type="text" name="productName" placeholder="Product Name" value={editingProduct ? editingProduct.productName : newProduct.productName} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, productName: e.target.value }) : handleChange} />
-                <select name="category" value={editingProduct ? editingProduct.category : newProduct.category} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, category: e.target.value }) : handleChange}>
-                    <option value="">Select Category</option>
+                {/* Custom Product Name Input */}
+                {customProduct && (
+                    <input
+                        type="text"
+                        placeholder="Enter new product name"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        required
+                    />
+                )}
+
+                {/* Category Selection */}
+                <label>Category:</label>
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
                     <option value="Raw Material">Raw Material</option>
                     <option value="Finished Product">Finished Product</option>
                 </select>
-                <input type="number" name="quantity" placeholder="Quantity (Kg)" value={editingProduct ? editingProduct.quantity : newProduct.quantity} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, quantity: e.target.value }) : handleChange} />
-                <input type="date" name="expiryDate" value={editingProduct ? editingProduct.expiryDate : newProduct.expiryDate} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, expiryDate: e.target.value }) : handleChange} />
-                <input type="text" name="batchNo" placeholder="Batch Number" value={editingProduct ? editingProduct.batchNo : newProduct.batchNo} onChange={editingProduct ? (e) => setEditingProduct({ ...editingProduct, batchNo: e.target.value }) : handleChange} />
 
-                {editingProduct ? (
-                    <button onClick={handleUpdateProduct}>Update Product</button>
-                ) : (
-                    <button onClick={handleAddProduct}>Add Product</button>
+                {/* Quantity */}
+                <label>Quantity:</label>
+                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
+
+                {/* Expiry Date */}
+                <label>Expiry Date:</label>
+                <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} required />
+
+                {/* Batch No */}
+                <label>Batch No:</label>
+                <input type="text" value={batchNo} onChange={(e) => setBatchNo(e.target.value)} required />
+
+                {/* Image Upload */}
+                <label>Upload Product Image:</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                {/* Image Preview */}
+                {preview && (
+                    <div className="preview-container">
+                        <img src={preview} alt="Product Preview" />
+                    </div>
                 )}
-            </div>
 
-            {/* Products Table */}
+                <button type="submit">Add Product</button>
+            </form>
+
+            {/* Product List */}
             <h3>Product List</h3>
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Quantity (Kg)</th>
-                        <th>Expiry Date</th>
-                        <th>Batch No</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.length > 0 ? (
-                        products.map(product => (
-                            <tr key={product._id}>
-                                <td>{product.productName}</td>
-                                <td>{product.category}</td>
-                                <td>{product.quantity}</td>
-                                <td>{new Date(product.expiryDate).toLocaleDateString()}</td>
-                                <td>{product.batchNo}</td>
-                                <td>
-                                    <button onClick={() => handleEditProduct(product)}>Edit</button>
-                                    <button onClick={() => handleDeleteProduct(product._id)} className="delete-btn">Delete</button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr><td colSpan="6">No products available.</td></tr>
-                    )}
-                </tbody>
-            </table>
+            <ul className="product-list">
+                {products.map((product) => (
+                    <li key={product._id}>
+                        {product.productName} - {product.category}
+                        <button onClick={() => handleEditProduct(product._id)}>Edit</button>
+                        <button onClick={() => handleDeleteProduct(product._id)}>Delete</button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
