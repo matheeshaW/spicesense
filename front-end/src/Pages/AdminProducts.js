@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";  
 import "../Styles/adminProducts.css";
 
+
 const API_URL = "http://localhost:5000/api/products"; 
 const API_NAMES = "http://localhost:5000/api/products/names";
 
@@ -14,9 +15,12 @@ const AdminProducts = () => {
     const [batchNo, setBatchNo] = useState("");
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState("");
-    const [productNames, setProductNames] = useState([]);  // List of product names
-    const [products, setProducts] = useState([]); // List of products
+    const [productNames, setProductNames] = useState([]);  
+    const [products, setProducts] = useState([]); 
     const [customProduct, setCustomProduct] = useState(false);
+
+    const [editMode, setEditMode] = useState(false);
+    const [editProductId, setEditProductId] = useState(null);
 
     // Fetch existing product names
     useEffect(() => {
@@ -32,11 +36,19 @@ const AdminProducts = () => {
             .catch(error => console.error("Error fetching products:", error));
     }, []);
 
+    useEffect(() => {
+        if (!editMode) {  
+            axios.get(`${API_URL}/latest-batch`)
+                .then(response => setBatchNo(response.data.batchNo))
+                .catch(error => console.error("Error fetching batch number:", error));
+        }
+    }, [editMode]); 
+
     // Handle product name selection
     const handleProductChange = (e) => {
         if (e.target.value === "custom") {
             setCustomProduct(true);
-            setProductName("");
+            setProductName(""); // Reset product name for new input
         } else {
             setCustomProduct(false);
             setProductName(e.target.value);
@@ -60,7 +72,7 @@ const AdminProducts = () => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append("productName", productName || customProduct);
+        formData.append("productName", productName || (customProduct ? "Custom Product" : ""));
         formData.append("category", category);
         formData.append("quantity", quantity);
         formData.append("expiryDate", expiryDate);
@@ -68,36 +80,60 @@ const AdminProducts = () => {
         if (image) formData.append("image", image);
 
         try {
-            await axios.post(API_URL, formData, {
+            const response = await axios.post(API_URL, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
+            console.log("Product added:", response.data);
             alert("Product added successfully!");
             window.location.reload();
         } catch (error) {
-            console.error("Error adding product:", error);
-            alert("Error adding product!");
+            console.error("Error adding product:", error.response?.data || error.message);
+            alert("Error adding product! " + (error.response?.data?.error || "Check console for details."));
         }
     };
 
     // Delete Product
     const handleDeleteProduct = async (id) => {
         try {
-            await axios.delete(`${API_URL}/${id}`);
-            alert("Product deleted successfully!");
-            window.location.reload();
+            const response = await axios.delete(`${API_URL}/${id}`);
+            if (response.status === 200) {
+                alert("Batch deleted successfully!");
+                setProducts(products.filter(product => product._id !== id));
+            }
         } catch (error) {
-            console.error("Error deleting product:", error);
-            alert("Error deleting product!");
+            console.error("Error deleting batch:", error);
+            alert("Error deleting batch!");
         }
     };
 
-    // Edit Product Name
-    const handleEditProduct = async (id) => {
-        const newName = prompt("Enter new product name:");
-        if (!newName) return;
+    
+
+    const handleEditProduct = (product) => {
+        setEditMode(true);
+        setEditProductId(product._id);
+        setProductName(product.productName);
+        setCategory(product.category);
+        setQuantity(product.quantity);
+        setExpiryDate(product.expiryDate);
+        setBatchNo(product.batchNo);
+        setPreview(product.image);
+    };
+
+    const handleUpdateProduct = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("productName", productName);
+        formData.append("category", category);
+        formData.append("quantity", quantity);
+        formData.append("expiryDate", expiryDate);
+        formData.append("batchNo", batchNo);
+        if (image) formData.append("image", image);
 
         try {
-            await axios.put(`${API_URL}/${id}`, { productName: newName });
+            await axios.put(`${API_URL}/${editProductId}`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             alert("Product updated successfully!");
             window.location.reload();
         } catch (error) {
@@ -149,7 +185,7 @@ const AdminProducts = () => {
 
                 {/* Batch No */}
                 <label>Batch No:</label>
-                <input type="text" value={batchNo} onChange={(e) => setBatchNo(e.target.value)} required />
+                <input type="text" value={batchNo} onChange={(e) => setBatchNo(e.target.value)} readOnly />
 
                 {/* Image Upload */}
                 <label>Upload Product Image:</label>
@@ -162,20 +198,43 @@ const AdminProducts = () => {
                     </div>
                 )}
 
-                <button type="submit">Add Product</button>
+                <button type="submit">{editMode ? "Update Product" : "Add Product" }</button>
             </form>
 
             {/* Product List */}
             <h3>Product List</h3>
-            <ul className="product-list">
-                {products.map((product) => (
-                    <li key={product._id}>
-                        {product.productName} - {product.category}
-                        <button onClick={() => handleEditProduct(product._id)}>Edit</button>
-                        <button onClick={() => handleDeleteProduct(product._id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <table className="product-list">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Expiry date</th>
+                        <th>Batch No</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {products.map((product) => (
+                        <tr key={product._id}>
+                            <td>{product.productName}</td>
+                            <td>{product.category}</td>
+                            <td>{product.quantity}</td>
+                            <td>{new Date(product.expiryDate).toLocaleDateString()}</td>
+                            <td>{product.batchNo}</td>
+                            <td>
+                                {product.image && <img src={ `${API_URL}${product.image}`} alt="Product" width="50"/>}
+                            </td>
+
+                            <td>
+                                <button onClick={() => handleEditProduct(product)}>Edit</button>
+                                <button onClick={() => handleDeleteProduct(product._id)}>Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };

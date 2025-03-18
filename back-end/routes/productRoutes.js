@@ -3,6 +3,7 @@ const router = express.Router();
 const Product = require('../models/Product');
 const multer = require("multer");
 const path = require("path");
+const { error } = require('console');
 
 // image storage configuration
 const storage = multer.diskStorage({
@@ -14,14 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get('/names', async (req, res) => {
-    try {
-        const products = await Product.find({}, "productName");
-        res.json(products.map(product => product.productName));
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching product names", error });
-    }
-});
+
 
 router.get("/", async (req, res) => {
     try {
@@ -44,41 +38,76 @@ router.get('/:id', async (req, res) => {
 
 router.post("/", upload.single("image"), async (req, res) => {
     try {
+        const { productName, category, quantity, expiryDate } = req.body;
+        const image = req.file ? `/uploads/${req.file.fieldname}` : req.body.imageUrl;
+
+        const lastProduct = await Product.findOne().sort({ batchNo: -1 });
+
+        let newBatchNo = "B100";
+        if (lastProduct && lastProduct.batchNo) {
+            const lastBatchNumber = parseInt(lastProduct.batchNo.substring(1));
+            newBatchNo = `B${lastBatchNumber + 1}`;
+        }
+
         const newProduct = new Product({
-            productName: req.body.productName,
-            category: req.body.category,
-            quantity: req.body.quantity,
-            expiryDate: req.body.expiryDate,
-            batchNo: req.body.batchNo,
-            image: req.file ? `/uploads/${req.file.filename}` : null
+            productName,
+            category,
+            quantity,
+            expiryDate,
+            image,
+            batchNo: newBatchNo
         });
 
         await newProduct.save();
-        res.status(201).json(newProduct);
+        res.json({ message: "Product added successfully!", product: newProduct });
+    
     } catch (error) {
         res.status(400).json({ message: "Error adding product", error });
     }
 });
 
-// router.post('/', async (req, res) => {
-//     try {
-//         const newProduct = new Product(req.body);
-//         await newProduct.save();
-//         res.status(201).json(newProduct);
-//     } catch (error) {
-//         res.status(400).json({ message: "Error adding product", error });
-//     }
-// });
 
-router.put('/:id', async (req, res) => {
+
+router.put("/:id", upload.single("image"), async (req, res) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
-        res.json(updatedProduct);
+        const { productName, category, quantity, expiryDate} = req.body;
+        const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl;
+
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        existingProduct.productName = productName;
+        existingProduct.category = category;
+        existingProduct.quantity = quantity;
+        existingProduct.expiryDate = expiryDate;
+        existingProduct.image = image;
+
+        const updatedProduct = await existingProduct.save();
+
+        res.json({ message: "Product updated successfully!", product: updatedProduct });
     } catch (error) {
-        res.status(500).json({ message: "Error updating product", error });
+        console.error("Error updating product", error);
+        res.status(500).json({ error: "Error updating product" });
     }
 });
+
+router.get("/latest-batch", async (req, res) => {
+    try {
+        const lastProduct = await Product.findOne({}, {}, { sort: { batchNo: -1 } });
+        if (lastProduct && lastProduct.batchNo) {
+            let lastBatchNo = parseInt(lastProduct.batchNo.replace("B", ""), 10);
+            return res.json({ batchNo: `B${lastBatchNo + 1}` });
+        } else {
+            return res.json({ batchNo: "B100" });  // Start from B100
+        }
+    } catch (error) {
+        console.error("Error fetching latest batch number:", error);
+        res.status(500).json({ error: "Error fetching batch number" });
+    }
+});
+
 
 router.delete('/:id', async (req, res) => {
     try {

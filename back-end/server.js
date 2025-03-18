@@ -1,81 +1,35 @@
 const express = require("express");
-const multer = require("multer");
-const Product = require("../models/ProductModel");  // ✅ Ensure this matches your model filename
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const productRoutes = require("./routes/productRoutes");
 
-const router = express.Router();
+dotenv.config(); // ✅ Load environment variables from .env
 
-// ✅ Image Storage Config
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");  // ✅ Ensure `uploads/` directory exists
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname);
-    }
+const app = express();
+
+// ✅ Middleware
+app.use(express.json());
+app.use(cors());
+
+// ✅ Routes
+app.use("/api/products", productRoutes);
+app.use("/uploads", express.static("uploads"));
+
+// ✅ Connect to MongoDB (Fixed)
+mongoose.connect(process.env.MONGO_URI, {
+    dbName: "spice-inventory-cluster",
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1); // Stop server if DB connection fails
 });
 
-const upload = multer({ storage });
-
-// ✅ Get Product Names Only
-router.get("/names", async (req, res) => {
-    try {
-        const products = await Product.find({}, "productName");
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: "Error fetching product names" });
-    }
-});
-
-// ✅ Add Product (With Image Upload)
-router.post("/", upload.single("image"), async (req, res) => {
-    try {
-        const { productName, category, quantity, expiryDate, batchNo } = req.body;
-        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-
-        const newProduct = new Product({
-            productName, category, quantity, expiryDate, batchNo, imageUrl
-        });
-
-        await newProduct.save();
-        res.status(201).json({ message: "Product added successfully!", product: newProduct });
-    } catch (error) {
-        console.error("Error adding product:", error);
-        res.status(500).json({ error: "Error adding product" });
-    }
-});
-
-// ✅ Get All Products
-router.get("/", async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: "Error fetching products" });
-    }
-});
-
-// ✅ Edit Product
-router.put("/:id", async (req, res) => {
-    try {
-        const { productName } = req.body;
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, { productName }, { new: true });
-
-        if (!updatedProduct) return res.status(404).json({ error: "Product not found" });
-
-        res.json(updatedProduct);
-    } catch (error) {
-        res.status(500).json({ error: "Error updating product" });
-    }
-});
-
-// ✅ Delete Product
-router.delete("/:id", async (req, res) => {
-    try {
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ message: "Product deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ error: "Error deleting product" });
-    }
+// ✅ Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
 module.exports = router;
