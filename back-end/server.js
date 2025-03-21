@@ -1,24 +1,24 @@
+
+require("dotenv").config();
 const express = require("express");
-const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const productRoutes = require("./routes/productRoutes");
 const router = express.Router();
 
-dotenv.config(); // ✅ Load environment variables from .env
-
 const app = express();
-
-// ✅ Middleware
 app.use(express.json());
 app.use(cors());
 
-// ✅ Routes
-app.use("/api/products", productRoutes);
-app.use("/uploads", express.static("uploads"));
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
+
+
 
 // ✅ Connect to MongoDB (Fixed)
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.MONGO_URIL, {
     dbName: "spice-inventory-cluster",
 })
 .then(() => console.log("✅ MongoDB Connected"))
@@ -33,4 +33,30 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
-module.exports = router;
+// Sample route
+app.get("/", (req, res) => res.send("API is running..."));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
+
+const orderRoutes = require("./routes/orders");
+app.use("/api/orders", orderRoutes);
+
+const paymentRoutes = require("./routes/payments");
+app.use("/api/payments", paymentRoutes);
+
+const itemRoutes = require("./routes/items");
+app.use("/api/items", itemRoutes);
+
+const creditCardRoutes = require("./routes/creditCards");
+app.use("/api/credit-cards", creditCardRoutes);
+
+
+//
+app.use("/api/products", productRoutes);
+app.use("/uploads", express.static("uploads"));
+
+
