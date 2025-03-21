@@ -1,0 +1,31 @@
+.expiry-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.expiry-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.expiry-table th, .expiry-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.Expired {
+    background-color: red;
+    color: white;
+}
+
+.Nearing-expiry {
+    background-color: orange;
+    color: black;
+}
+
+.Safe {
+    background-color: green;
+    color: white;
+}
