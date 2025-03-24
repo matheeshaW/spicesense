@@ -73,4 +73,42 @@ router.post('/create', async (req, res) => {
   }
 });
 
+// 🛠 Update Order (Shipping & Billing Address)
+router.put('/update/:id', async (req, res) => {
+  const { shippingAddress, billingAddress } = req.body;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { shippingAddress, billingAddress },
+      { new: true } // Returns the updated document
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ message: 'Order updated successfully', order });
+  } catch (err) {
+    console.error('❌ Error updating order:', err);
+    res.status(500).json({ message: 'Error updating order', error: err.message });
+  }
+});
+
+// 🛠 Delete Order
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    console.error('❌ Error deleting order:', err);
+    res.status(500).json({ message: 'Error deleting order', error: err.message });
+  }
+});
+
 module.exports = router;
