@@ -20,6 +20,8 @@ const CreditCardPage = () => {
         cvv: ""
     });
     const [editingCardId, setEditingCardId] = useState(null);
+    const [updateMessage, setUpdateMessage] = useState(""); // For update confirmation message
+    const [deleteMessage, setDeleteMessage] = useState(""); // For delete confirmation message
 
     const API_BASE_URL = "http://localhost:5000/api/credit-cards";
 
@@ -94,23 +96,32 @@ const CreditCardPage = () => {
         if (!validateForm()) {
             return;
         }
-        
-        const method = editingCardId ? "PUT" : "POST";
-        const url = editingCardId ? `${API_BASE_URL}/${editingCardId}` : API_BASE_URL;
 
-        fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, ...formData }),
-        })
-            .then(res => res.json())
-            .then(() => {
-                setFormData({ cardNumber: "", cardHolder: "", expiryDate: "", cvv: "" });
-                setEditingCardId(null);
-                return fetch(`${API_BASE_URL}/${userId}`).then(res => res.json());
+        const isUpdate = !!editingCardId;
+        const confirmationMessage = isUpdate 
+            ? "Are you sure you want to update this credit card?"
+            : "Are you sure you want to add this credit card?";
+        
+        if (window.confirm(confirmationMessage)) {
+            const method = editingCardId ? "PUT" : "POST";
+            const url = editingCardId ? `${API_BASE_URL}/${editingCardId}` : API_BASE_URL;
+
+            fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, ...formData }),
             })
-            .then(data => setCards(data))
-            .catch(err => console.error("Error saving credit card:", err));
+                .then(res => res.json())
+                .then(() => {
+                    setFormData({ cardNumber: "", cardHolder: "", expiryDate: "", cvv: "" });
+                    setEditingCardId(null);
+                    setUpdateMessage(isUpdate ? "Credit card updated successfully!" : "Credit card added successfully!");
+                    setTimeout(() => setUpdateMessage(""), 3000); // Clear message after 3 seconds
+                    return fetch(`${API_BASE_URL}/${userId}`).then(res => res.json());
+                })
+                .then(data => setCards(data))
+                .catch(err => console.error("Error saving credit card:", err));
+        }
     };
 
     const handleEdit = (card) => {
@@ -124,144 +135,154 @@ const CreditCardPage = () => {
     };
 
     const handleDelete = (cardId) => {
-        fetch(`${API_BASE_URL}/${cardId}`, { method: "DELETE" })
-            .then(() => fetch(`${API_BASE_URL}/${userId}`).then(res => res.json()))
-            .then(data => setCards(data))
-            .catch(err => console.error("Error deleting credit card:", err));
+        if (window.confirm("Are you sure you want to delete this credit card?")) {
+            fetch(`${API_BASE_URL}/${cardId}`, { method: "DELETE" })
+                .then(() => {
+                    setDeleteMessage("Credit card deleted successfully!");
+                    setTimeout(() => setDeleteMessage(""), 3000); // Clear message after 3 seconds
+                    return fetch(`${API_BASE_URL}/${userId}`).then(res => res.json());
+                })
+                .then(data => setCards(data))
+                .catch(err => console.error("Error deleting credit card:", err));
+        }
     };
 
     return (
         <div>
             <NavigationBar />
-        <div className="credit-card-container">
-            <h2 className="credit-card-title">My Saved Credit Cards</h2>
-            
-            <table className="credit-card-table">
-                <thead>
-                    <tr>
-                        <th className="credit-card-th">Card Number</th>
-                        <th className="credit-card-th">Card Holder</th>
-                        <th className="credit-card-th">Expiry Date</th>
-                        <th className="credit-card-th">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {cards.map(card => (
-                        <tr key={card._id} className="credit-card-row">
-                            <td className="credit-card-td">**** **** **** {card.cardNumber.slice(-4)}</td>
-                            <td className="credit-card-td">{card.cardHolder}</td>
-                            <td className="credit-card-td">{card.expiryDate}</td>
-                            <td className="credit-card-td">
-                                <button 
-                                    onClick={() => handleEdit(card)}
-                                    className="credit-card-edit-btn"
-                                >
-                                    Edit
-                                </button>
-                                <button 
-                                    onClick={() => handleDelete(card._id)}
-                                    className="credit-card-delete-btn"
-                                >
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            <div className="credit-card-form-container">
-                <h3 className="credit-card-form-title">
-                    {editingCardId ? "Edit Credit Card" : "Add New Credit Card"}
-                </h3>
+            <div className="credit-card-container">
+                <h2 className="credit-card-title">My Saved Credit Cards</h2>
                 
-                <form onSubmit={handleSubmit} className="credit-card-form">
-                    <div className="credit-card-form-group">
-                        <label className="credit-card-label">Card Number</label>
-                        <input 
-                            type="text" 
-                            name="cardNumber" 
-                            placeholder="Card Number" 
-                            value={formData.cardNumber} 
-                            onChange={handleChange} 
-                            className={`credit-card-input ${errors.cardNumber ? "credit-card-input-error" : ""}`}
-                        />
-                        {errors.cardNumber && (
-                            <p className="credit-card-error">{errors.cardNumber}</p>
-                        )}
-                    </div>
+                {/* Display update/delete messages */}
+                {updateMessage && <div className="credit-card-success">{updateMessage}</div>}
+                {deleteMessage && <div className="credit-card-success">{deleteMessage}</div>}
+                
+                <table className="credit-card-table">
+                    <thead>
+                        <tr>
+                            <th className="credit-card-th">Card Number</th>
+                            <th className="credit-card-th">Card Holder</th>
+                            <th className="credit-card-th">Expiry Date</th>
+                            <th className="credit-card-th">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {cards.map(card => (
+                            <tr key={card._id} className="credit-card-row">
+                                <td className="credit-card-td">**** **** **** {card.cardNumber.slice(-4)}</td>
+                                <td className="credit-card-td">{card.cardHolder}</td>
+                                <td className="credit-card-td">{card.expiryDate}</td>
+                                <td className="credit-card-td">
+                                    <button 
+                                        onClick={() => handleEdit(card)}
+                                        className="credit-card-edit-btn"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(card._id)}
+                                        className="credit-card-delete-btn"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                <div className="credit-card-form-container">
+                    <h3 className="credit-card-form-title">
+                        {editingCardId ? "Edit Credit Card" : "Add New Credit Card"}
+                    </h3>
                     
-                    <div className="credit-card-form-group">
-                        <label className="credit-card-label">Card Holder Name</label>
-                        <input 
-                            type="text" 
-                            name="cardHolder" 
-                            placeholder="Card Holder Name" 
-                            value={formData.cardHolder} 
-                            onChange={handleChange} 
-                            className={`credit-card-input ${errors.cardHolder ? "credit-card-input-error" : ""}`}
-                        />
-                        {errors.cardHolder && (
-                            <p className="credit-card-error">{errors.cardHolder}</p>
-                        )}
-                    </div>
-                    
-                    <div className="credit-card-form-row">
+                    <form onSubmit={handleSubmit} className="credit-card-form">
                         <div className="credit-card-form-group">
-                            <label className="credit-card-label">Expiry Date</label>
+                            <label className="credit-card-label">Card Number</label>
                             <input 
                                 type="text" 
-                                name="expiryDate" 
-                                placeholder="MM/YY" 
-                                value={formData.expiryDate} 
+                                name="cardNumber" 
+                                placeholder="Card Number" 
+                                value={formData.cardNumber} 
                                 onChange={handleChange} 
-                                className={`credit-card-input ${errors.expiryDate ? "credit-card-input-error" : ""}`}
+                                className={`credit-card-input ${errors.cardNumber ? "credit-card-input-error" : ""}`}
                             />
-                            {errors.expiryDate && (
-                                <p className="credit-card-error">{errors.expiryDate}</p>
+                            {errors.cardNumber && (
+                                <p className="credit-card-error">{errors.cardNumber}</p>
                             )}
                         </div>
                         
                         <div className="credit-card-form-group">
-                            <label className="credit-card-label">CVV</label>
+                            <label className="credit-card-label">Card Holder Name</label>
                             <input 
                                 type="text" 
-                                name="cvv" 
-                                placeholder="CVV" 
-                                value={formData.cvv} 
+                                name="cardHolder" 
+                                placeholder="Card Holder Name" 
+                                value={formData.cardHolder} 
                                 onChange={handleChange} 
-                                className={`credit-card-input ${errors.cvv ? "credit-card-input-error" : ""}`}
+                                className={`credit-card-input ${errors.cardHolder ? "credit-card-input-error" : ""}`}
                             />
-                            {errors.cvv && (
-                                <p className="credit-card-error">{errors.cvv}</p>
+                            {errors.cardHolder && (
+                                <p className="credit-card-error">{errors.cardHolder}</p>
                             )}
                         </div>
-                    </div>
-                    
-                    <div className="credit-card-form-buttons">
-                        <button 
-                            type="submit" 
-                            className="credit-card-submit-btn"
-                        >
-                            {editingCardId ? "Update Card" : "Add Card"}
-                        </button>
                         
-                        {editingCardId && (
+                        <div className="credit-card-form-row">
+                            <div className="credit-card-form-group">
+                                <label className="credit-card-label">Expiry Date</label>
+                                <input 
+                                    type="text" 
+                                    name="expiryDate" 
+                                    placeholder="MM/YY" 
+                                    value={formData.expiryDate} 
+                                    onChange={handleChange} 
+                                    className={`credit-card-input ${errors.expiryDate ? "credit-card-input-error" : ""}`}
+                                />
+                                {errors.expiryDate && (
+                                    <p className="credit-card-error">{errors.expiryDate}</p>
+                                )}
+                            </div>
+                            
+                            <div className="credit-card-form-group">
+                                <label className="credit-card-label">CVV</label>
+                                <input 
+                                    type="text" 
+                                    name="cvv" 
+                                    placeholder="CVV" 
+                                    value={formData.cvv} 
+                                    onChange={handleChange} 
+                                    className={`credit-card-input ${errors.cvv ? "credit-card-input-error" : ""}`}
+                                />
+                                {errors.cvv && (
+                                    <p className="credit-card-error">{errors.cvv}</p>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="credit-card-form-buttons">
                             <button 
-                                type="button"
-                                onClick={() => {
-                                    setFormData({ cardNumber: "", cardHolder: "", expiryDate: "", cvv: "" });
-                                    setEditingCardId(null);
-                                }}
-                                className="credit-card-cancel-btn"
+                                type="submit" 
+                                className="credit-card-submit-btn"
                             >
-                                Cancel
+                                {editingCardId ? "Update Card" : "Add Card"}
                             </button>
-                        )}
-                    </div>
-                </form>
+                            
+                            {editingCardId && (
+                                <button 
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData({ cardNumber: "", cardHolder: "", expiryDate: "", cvv: "" });
+                                        setEditingCardId(null);
+                                    }}
+                                    className="credit-card-cancel-btn"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     );
 };
