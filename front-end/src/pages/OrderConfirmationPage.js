@@ -25,7 +25,7 @@ const OrderConfirmationPage = () => {
 
       const updatedOrder = {
         items: order.items.map((item) => {
-          const itemId = item.itemId?._id || item.itemId; // Fallback to itemId if not populated
+          const itemId = item.itemId?._id || item.itemId; 
           if (!itemId) {
             throw new Error('Item ID is missing in order data');
           }
