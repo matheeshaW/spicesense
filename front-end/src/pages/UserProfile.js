@@ -10,6 +10,20 @@ import "../Styles/UserProfile.css"; // Import CSS from Styles folder
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    shippingAddress: "",
+    billingAddress: "",
+    companyName: "",
+    contactPerson: "",
+    jobTitle: "",
+    department: ""
+  });
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const userId = sessionStorage.getItem("userId");
@@ -20,6 +34,7 @@ const UserProfile = () => {
         const passedUserData = location.state?.userData;
         if (passedUserData) {
           setUserData(passedUserData);
+          initializeFormData(passedUserData);
           return;
         }
         const response = await axios.get("http://localhost:5000/api/user/data", {
@@ -27,6 +42,7 @@ const UserProfile = () => {
         });
         if (response.data.success) {
           setUserData(response.data.userData);
+          initializeFormData(response.data.userData);
         } else {
           setError(response.data.message);
           navigate("/login");
