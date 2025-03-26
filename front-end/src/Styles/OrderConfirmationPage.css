@@ -96,9 +96,7 @@
     outline: none;
   }
   
-  .order-confirmation-input[type="number"] {
-    -moz-appearance: textfield; /* Remove number input arrows in Firefox */
-  }
+ 
   
   .order-confirmation-input::-webkit-outer-spin-button,
   .order-confirmation-input::-webkit-inner-spin-button {
