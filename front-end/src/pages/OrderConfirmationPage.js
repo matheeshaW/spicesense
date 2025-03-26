@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchOrder, updateOrder, deleteOrder } from '../api';
+import NavigationBar from "../components/NavigationBar";
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
@@ -75,6 +76,8 @@ const OrderConfirmationPage = () => {
 
   return (
     <div>
+            <NavigationBar />
+    <div>
       <h2>Order Confirmation</h2>
       {isEditing ? (
         <>
@@ -122,6 +125,7 @@ const OrderConfirmationPage = () => {
           <button onClick={handleCancel}>Cancel Order</button>
         </>
       )}
+    </div>
     </div>
   );
 };
