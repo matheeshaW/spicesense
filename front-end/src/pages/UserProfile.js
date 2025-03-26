@@ -150,7 +150,7 @@ const UserProfile = () => {
         return (
           <>
             <p><strong>Company Name:</strong> {userData.companyName}</p>
-            <p><strong>Contact Person:</strong> {userData.contactPerson}</p>
+            <p><strong>warehouse Location:</strong> {userData.contactPerson}</p>
           </>
         );
       case "employee":
@@ -209,10 +209,10 @@ const UserProfile = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Contact Person</label>
+              <label className="block text-gray-700 mb-2">warehouse location</label>
               <input
                 type="text"
-                name="contactPerson"
+                name="warehouse location"
                 value={formData.contactPerson}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded"
@@ -307,7 +307,7 @@ const UserProfile = () => {
                     />
                   </div>
                   
-                  <div className="mb-4">
+                  <div className="mb-4"> 
                     <label className="block text-gray-700 mb-2">Email (cannot be changed)</label>
                     <input
                       type="email"
