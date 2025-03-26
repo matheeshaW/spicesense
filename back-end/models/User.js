@@ -1,16 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  role: String,
-  creditCards: [{
-    cardNumber: String,
-    cardHolder: String,
-    expiryDate: String
-  }]
+const UserSchema = new mongoose.Schema({
+    name: String,
+    email: { type: String, unique: true },
+    password: String,
+    role: { type: String, enum: ["admin", "customer", "supplier", "employee"], default: "customer" },
+    creditCards: [{ number: String, expiry: String, cvv: String }]
 });
 
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+module.exports = mongoose.model("User", UserSchema);
