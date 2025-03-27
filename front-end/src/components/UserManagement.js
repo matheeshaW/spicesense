@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Loading from './Loading';
-import '../Styles/UserManagement.css'; // Ensure this path matches your project structure
-
+import '../Styles/UserManagement.css'; 
 const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
   if (!isOpen) return null;
 

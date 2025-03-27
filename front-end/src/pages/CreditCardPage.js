@@ -1,6 +1,6 @@
-// pages/CreditCardPage.js
+
 import React, { useState, useEffect } from "react";
-import "../Styles/CreditCardPage.css"; // Import CSS from Styles folder
+import "../Styles/CreditCardPage.css"; 
 import NavigationBar from "../components/NavigationBar";
 
 const CreditCardPage = () => {
