@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../Styles/searchFilter.css";
 import NavBar from "../components/navBar";
+import backgroundImage from "../assets/background.png";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -14,7 +15,19 @@ const SearchFilter = () => {
     const [expiryFilter, setExpiryFilter] = useState("");
     const [stockFilter, setStockFilter] = useState("");
 
-    // Fetch stocks from backend
+    useEffect(() => {
+            document.body.style.backgroundImage = `url(${backgroundImage})`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundAttachment = "fixed";
+            document.body.style.backgroundRepeat = "no-repeat";
+    
+            return () => {
+                document.body.style.backgroundImage = ""; 
+            };
+        }, []);
+
+    // Fetch stocks 
     useEffect(() => {
         axios.get(`${API_URL}/stocks/searchFilter`)
             .then(response => setStocks(response.data))
@@ -44,13 +57,7 @@ const SearchFilter = () => {
     });
 
     return (
-        <div style={{
-            backgroundImage: `url(${require("../assets/background.png")})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
-            backgroundRepeat: "no-repeat"
-}}>
+        <div>
             <NavBar /> 
         <div className="search-filter-container">
             <h2>Search & Filter</h2>
