@@ -1,0 +1,252 @@
+/* src/Styles/AdminDashboard.css */
+
+/* Spice-inspired color palette */
+:root {
+    --ad-saffron: #ffaa33; /* Vibrant yellow-orange */
+    --ad-turmeric: #e69b00; /* Warm golden yellow */
+    --ad-cinnamon: #8b4513; /* Rich brown */
+    --ad-paprika: #d2691e; /* Spicy orange-red */
+    --ad-cream: #fff8e6; /* Light creamy background */
+    --ad-shadow: rgba(139, 69, 19, 0.2); /* Subtle cinnamon shadow */
+    --ad-gray: #6b4e31; /* Muted brown-gray for text */
+  }
+  
+  /* Main container */
+  .ad-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, var(--ad-cream), var(--ad-saffron));
+    padding: 2rem 1rem;
+    animation: adFadeIn 0.5s ease-in;
+  }
+  
+  /* Wrapper */
+  .ad-wrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  
+  /* Header */
+  .ad-header {
+    background: #fff;
+    box-shadow: 0 4px 12px var(--ad-shadow);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .ad-header:hover {
+    transform: translateY(-2px);
+  }
+  
+  .ad-header-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--ad-cinnamon);
+  }
+  
+  /* Buttons */
+  .ad-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .ad-button-logout {
+    background: var(--ad-cinnamon);
+    color: #fff;
+  }
+  
+  .ad-button-logout:hover {
+    background: #a0522d;
+  }
+  
+  .ad-button-primary {
+    background: var(--ad-turmeric);
+    color: #fff;
+  }
+  
+  .ad-button-primary:hover {
+    background: var(--ad-paprika);
+  }
+  
+  /* Error message */
+  .ad-error {
+    background: rgba(210, 105, 30, 0.1);
+    border: 1px solid var(--ad-paprika);
+    color: var(--ad-cinnamon);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Loading state */
+  .ad-loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.125rem;
+    color: var(--ad-gray);
+  }
+  
+  /* Main layout */
+  .ad-main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .ad-main {
+      grid-template-columns: 250px 1fr;
+    }
+  }
+  
+  /* Sidebar */
+  .ad-sidebar {
+    background: #fff;
+    box-shadow: 0 4px 12px var(--ad-shadow);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    height: fit-content;
+  }
+  
+  .ad-user-info {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--ad-saffron);
+  }
+  
+  .ad-user-label {
+    font-size: 0.875rem;
+    color: var(--ad-gray);
+  }
+  
+  .ad-user-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--ad-cinnamon);
+  }
+  
+  .ad-user-email {
+    font-size: 0.875rem;
+    color: var(--ad-gray);
+  }
+  
+  .ad-nav-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .ad-nav-button {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--ad-cream);
+    color: var(--ad-gray);
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .ad-nav-button:hover {
+    background: var(--ad-turmeric);
+    color: #fff;
+  }
+  
+  .ad-nav-button-active {
+    background: var(--ad-paprika);
+    color: #fff;
+  }
+  
+  /* Content area */
+  .ad-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .ad-content-space {
+    background: #fff;
+    box-shadow: 0 4px 12px var(--ad-shadow);
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+  
+  /* Card */
+  .ad-card {
+    text-align: center;
+  }
+  
+  .ad-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ad-cinnamon);
+    margin-bottom: 1rem;
+  }
+  
+  .ad-card-text {
+    font-size: 1.125rem;
+    color: var(--ad-gray);
+    margin-bottom: 0.5rem;
+  }
+  
+  .ad-card-subtext {
+    font-size: 0.875rem;
+    color: var(--ad-gray);
+    margin-bottom: 2rem;
+  }
+  
+  /* Grid for dashboard items */
+  .ad-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .ad-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .ad-grid-item {
+    background: var(--ad-cream);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    transition: transform 0.3s ease;
+  }
+  
+  .ad-grid-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--ad-shadow);
+  }
+  
+  .ad-grid-item-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--ad-cinnamon);
+    margin-bottom: 0.5rem;
+  }
+  
+  .ad-grid-item-text {
+    font-size: 0.875rem;
+    color: var(--ad-gray);
+    margin-bottom: 1rem;
+  }
+  
+  /* Animations */
+  @keyframes adFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }

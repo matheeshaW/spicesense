@@ -1,0 +1,285 @@
+/* src/Styles/UserManagement.css */
+
+/* Spice-inspired color palette */
+:root {
+    --um-saffron: #ffaa33; /* Vibrant yellow-orange */
+    --um-turmeric: #e69b00; /* Warm golden yellow */
+    --um-cinnamon: #8b4513; /* Rich brown */
+    --um-paprika: #d2691e; /* Spicy orange-red */
+    --um-cream: #fff8e6; /* Light creamy background */
+    --um-shadow: rgba(139, 69, 19, 0.2); /* Subtle cinnamon shadow */
+    --um-gray: #6b4e31; /* Muted brown-gray for text */
+  }
+  
+  /* Main container */
+  .um-container {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px var(--um-shadow);
+    animation: umFadeIn 0.5s ease-in;
+  }
+  
+  /* Title */
+  .um-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--um-cinnamon);
+    margin-bottom: 1rem;
+  }
+  
+  /* Role filter tabs */
+  .um-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--um-saffron);
+    overflow-x: auto;
+  }
+  
+  .um-tab-btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    color: var(--um-gray);
+    transition: all 0.3s ease;
+  }
+  
+  .um-tab-btn:hover {
+    color: var(--um-turmeric);
+  }
+  
+  .um-tab-btn-active {
+    color: var(--um-cinnamon);
+    border-bottom: 2px solid var(--um-cinnamon);
+  }
+  
+  /* Status messages */
+  .um-error {
+    background: rgba(210, 105, 30, 0.1);
+    border: 1px solid var(--um-paprika);
+    color: var(--um-cinnamon);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .um-success {
+    background: rgba(34, 139, 34, 0.1);
+    border: 1px solid #228b22;
+    color: #228b22;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Table */
+  .um-table-container {
+    overflow-x: auto;
+  }
+  
+  .um-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--um-saffron);
+  }
+  
+  .um-table thead {
+    background: var(--um-cream);
+  }
+  
+  .um-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: var(--um-gray);
+    border: 1px solid var(--um-saffron);
+  }
+  
+  .um-table tbody tr {
+    transition: background 0.3s ease;
+  }
+  
+  .um-table tbody tr:hover {
+    background: rgba(255, 248, 230, 0.5);
+  }
+  
+  .um-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--um-saffron);
+    color: var(--um-gray);
+  }
+  
+  .um-table-action {
+    text-align: center;
+  }
+  
+  .um-update-btn {
+    background: var(--um-turmeric);
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-right: 0.5rem;
+    transition: background 0.3s ease;
+  }
+  
+  .um-update-btn:hover {
+    background: var(--um-paprika);
+  }
+  
+  .um-delete-btn {
+    background: var(--um-cinnamon);
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    transition: background 0.3s ease;
+  }
+  
+  .um-delete-btn:hover {
+    background: #a0522d;
+  }
+  
+  /* Update Form Modal */
+  .um-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    animation: umFadeIn 0.3s ease-in;
+  }
+  
+  .um-modal-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 16px var(--um-shadow);
+    width: 100%;
+    max-width: 28rem;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .um-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .um-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--um-cinnamon);
+  }
+  
+  .um-close-btn {
+    font-size: 1.5rem;
+    color: var(--um-gray);
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .um-close-btn:hover {
+    color: var(--um-cinnamon);
+  }
+  
+  .um-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .um-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .um-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--um-gray);
+    margin-bottom: 0.25rem;
+  }
+  
+  .um-input,
+  .um-select,
+  .um-textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--um-saffron);
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+  }
+  
+  .um-input:focus,
+  .um-select:focus,
+  .um-textarea:focus {
+    outline: none;
+    border-color: var(--um-paprika);
+    box-shadow: 0 0 0 3px rgba(210, 105, 30, 0.2);
+  }
+  
+  .um-textarea {
+    resize: vertical;
+    min-height: 4rem;
+  }
+  
+  .um-form-note {
+    font-size: 0.75rem;
+    color: var(--um-gray);
+    margin-top: 0.25rem;
+  }
+  
+  .um-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .um-cancel-btn {
+    background: var(--um-gray);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: background 0.3s ease;
+  }
+  
+  .um-cancel-btn:hover {
+    background: #8b5a2b;
+  }
+  
+  .um-submit-btn {
+    background: var(--um-turmeric);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: background 0.3s ease;
+  }
+  
+  .um-submit-btn:hover {
+    background: var(--um-paprika);
+  }
+  
+  .um-submit-btn:disabled {
+    background: var(--um-gray);
+    cursor: not-allowed;
+  }
+  
+  /* Empty state */
+  .um-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--um-gray);
+  }
+  
+  /* Animations */
+  @keyframes umFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
