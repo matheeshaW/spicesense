@@ -1,4 +1,3 @@
-// SPICESENSE/back-end/controllers/userController.js
 
 import userModel from "../models/userModel.js";
 import transporter from "../config/nodemailer.js";
@@ -6,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 export const getUserData = async (req, res) => {
   try {
-    // Extract userId from the JWT payload properly
+  
     if (!req.user || !req.user.id) {
       return res.status(401).json({ success: false, message: "Unauthorized: No user ID found" });
     }
@@ -14,7 +13,7 @@ export const getUserData = async (req, res) => {
     const userId = req.user.id;
     console.log("Getting data for user ID:", userId);
 
-    // Find user and include role in the response
+  
     const user = await userModel.findById(userId).select("name email role phone isAccountVerified shippingAddress billingAddress companyName contactPerson jobTitle department");
 
     if (!user) {
@@ -30,15 +29,14 @@ export const getUserData = async (req, res) => {
   }
 };
 
-// Get all users (admin only)
 export const getAllUsers = async (req, res) => {
   try {
-    // Verify that the requester is an admin
+    // is an admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
 
-    // Get all users excluding sensitive data like password
+  
     const users = await userModel.find().select("-password -verifyOtp -resetOtp -resetOtpExpireAt");
     
     return res.json({ success: true, users });
@@ -49,10 +47,9 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// Get users by role (admin only)
 export const getUsersByRole = async (req, res) => {
   try {
-    // Verify that the requester is an admin
+    // Verify  admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
@@ -64,7 +61,7 @@ export const getUsersByRole = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid role specified" });
     }
 
-    // Get users by role excluding sensitive data
+    
     const users = await userModel.find({ role }).select("-password -verifyOtp -resetOtp -resetOtpExpireAt");
     
     return res.json({ success: true, users });
@@ -75,10 +72,10 @@ export const getUsersByRole = async (req, res) => {
   }
 };
 
-// Update user (admin only)
+
 export const updateUser = async (req, res) => {
   try {
-    // Verify that the requester is an admin
+    
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
@@ -86,18 +83,18 @@ export const updateUser = async (req, res) => {
     const { userId } = req.params;
     const updateData = req.body;
     
-    // Find user first to get their email
+    
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     
-    // Handle password update if provided
+  
     if (updateData.password) {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     }
     
-    // Prevent role change for the only admin (optional safety feature)
+    
     if (updateData.role && user.role === 'admin' && updateData.role !== 'admin') {
       const adminCount = await userModel.countDocuments({ role: 'admin' });
       if (adminCount <= 1) {
@@ -211,12 +208,12 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// Add this function to your userController.js file
 
-// Update user profile (for self-update by any user)
+
+
 export const updateUserProfile = async (req, res) => {
   try {
-    // Get user ID from authenticated user
+    
     if (!req.user || !req.user.id) {
       return res.status(401).json({ success: false, message: "Unauthorized: No user ID found" });
     }
@@ -224,22 +221,22 @@ export const updateUserProfile = async (req, res) => {
     const userId = req.user.id;
     const updateData = req.body;
     
-    // Find user first
+    
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     
-    // For security, prevent changing email and role through this endpoint
+  
     delete updateData.email;
     delete updateData.role;
     delete updateData.password;
     delete updateData.isAccountVerified;
     
-    // Update only allowed fields based on user role
+    
     const allowedFields = ["name", "phone"];
     
-    // Add role-specific fields
+    
     switch (user.role) {
       case "customer":
         allowedFields.push("shippingAddress", "billingAddress");
@@ -254,7 +251,7 @@ export const updateUserProfile = async (req, res) => {
         break;
     }
     
-    // Filter out any fields that aren't allowed for this user's role
+    // user's role
     const filteredUpdateData = {};
     Object.keys(updateData).forEach(key => {
       if (allowedFields.includes(key)) {

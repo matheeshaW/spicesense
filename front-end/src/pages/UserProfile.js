@@ -149,8 +149,13 @@ const UserProfile = () => {
       case "supplier":
         return (
           <>
+<<<<<<< Updated upstream
             <p><strong>Company Name:</strong> {userData.companyName}</p>
             <p><strong>warehouse Location:</strong> {userData.contactPerson}</p>
+=======
+            <p className="profile-spiced-detail"><strong>Company Name:</strong> {userData.companyName}</p>
+            <p className="profile-spiced-detail"><strong>warehouse location:</strong> {userData.contactPerson}</p>
+>>>>>>> Stashed changes
           </>
         );
       case "employee":
@@ -208,8 +213,13 @@ const UserProfile = () => {
                 className="w-full p-2 border rounded"
               />
             </div>
+<<<<<<< Updated upstream
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">warehouse location</label>
+=======
+            <div className="profile-spiced-form-group">
+              <label className="profile-spiced-label">warehouse location</label>
+>>>>>>> Stashed changes
               <input
                 type="text"
                 name="warehouse location"

@@ -9,6 +9,7 @@ const Register = () => {
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("customer");
   const [companyName, setCompanyName] = useState("");
@@ -21,6 +22,27 @@ const Register = () => {
   const [error, setError] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(true);
   const navigate = useNavigate();
+
+  const validatePassword = (passwordValue) => {
+    if (!passwordValue) {
+      setPasswordError("Password is required");
+      return false;
+    } else if (passwordValue.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+    if (confirmPassword) {
+      setPasswordMatch(value === confirmPassword);
+    }
+  };
 
   const handleConfirmPasswordChange = (e) => {
     const value = e.target.value;
@@ -51,6 +73,11 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (!validatePassword(password)) {
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -145,13 +172,11 @@ const Register = () => {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordMatch(e.target.value === confirmPassword);
-              }}
+              onChange={handlePasswordChange}
               required
-              className="auth-input"
+              className={`auth-input ${passwordError ? 'auth-error' : ''}`}
             />
+            {passwordError && <p className="auth-error-text">{passwordError}</p>}
           </div>
 
           <div className="auth-form-group">
@@ -178,7 +203,7 @@ const Register = () => {
             >
               <option value="customer">Customer</option>
               <option value="supplier">Supplier</option>
-              <option value="admin">Admin</option>
+             <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -242,7 +267,7 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={loading || !passwordMatch || phoneError}
+            disabled={loading || !passwordMatch || phoneError || passwordError}
             className="auth-button"
           >
             {loading ? "Registering..." : "Register"}
