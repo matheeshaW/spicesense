@@ -8,9 +8,9 @@ export const register = async (req, res) => {
   const { 
     name, 
     email, 
-    phone, 
+    phone, // Added phone
     password, 
-    confirmPassword, 
+    confirmPassword, // Added confirm password
     role, 
     companyName, 
     contactPerson, 
@@ -184,13 +184,13 @@ export const logout = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      path: "/", 
+      path: "/", // Ensure correct path
     };
 
     res.clearCookie("token", cookieOptions);
-    res.setHeader("Set-Cookie", "token=; HttpOnly; Max-Age=0; SameSite=None; Path=/; Secure"); 
+    res.setHeader("Set-Cookie", "token=; HttpOnly; Max-Age=0; SameSite=None; Path=/; Secure"); // Fallback for some browsers
 
-    console.log("Logout Cookie Cleared with Options:", cookieOptions); 
+    console.log("Logout Cookie Cleared with Options:", cookieOptions); // Debug log
 
     return res.status(200).json({ success: true, message: "Logged Out" });
 

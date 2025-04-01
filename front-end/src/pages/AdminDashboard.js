@@ -34,7 +34,7 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error("Error fetching user data:", error.response?.data?.message || error.message);
         setError("Failed to load dashboard. Please log in again.");
-        navigate("/login");
+        navigate("/welcome");
       }
     };
 
