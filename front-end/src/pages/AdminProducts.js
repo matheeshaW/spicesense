@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";  
 import "../Styles/adminProducts.css";
 import NavBar from "../components/navBar";
+import backgroundImage from "../assets/background.png";
 
 
 const API_URL = "http://localhost:5000/api/products";
@@ -13,7 +14,18 @@ const AdminProducts = () => {
     const [formData, setFormData] = useState({ productName: "", category: "", image: null });
     const [editingId, setEditingId] = useState(null);
 
-  
+    useEffect(() => {
+                document.body.style.backgroundImage = `url(${backgroundImage})`;
+                document.body.style.backgroundSize = "cover";
+                document.body.style.backgroundPosition = "center";
+                document.body.style.backgroundAttachment = "fixed";
+                document.body.style.backgroundRepeat = "no-repeat";
+        
+                return () => {
+                    document.body.style.backgroundImage = ""; 
+                };
+            }, []);
+    
 
     // fetch products
     useEffect(() => {
@@ -47,7 +59,7 @@ const AdminProducts = () => {
         try {
             let response;
             if (editingId) {
-                // Update existing product
+                
                 response = await axios.put(`${API_URL}/${editingId}`, productData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
@@ -55,7 +67,7 @@ const AdminProducts = () => {
                 setProducts(products.map(p => (p._id === editingId ? response.data.product : p)));
                 setEditingId(null);
             } else {
-                // Add new product
+                
                 response = await axios.post(API_URL, productData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
@@ -63,7 +75,7 @@ const AdminProducts = () => {
                 setProducts([...products, response.data.product]);
             }
     
-            // Reset form after submission
+            
             setFormData({ productName: "", category: "", image: null });
             window.location.reload();
         } catch (error) {
@@ -78,7 +90,7 @@ const AdminProducts = () => {
         try {
             await axios.delete(`${API_URL}/${id}`);
             alert("Product deleted!");
-            setProducts(products.filter(p => p._id !== id)); // Update state after deleting
+            setProducts(products.filter(p => p._id !== id)); 
         } catch (error) {
             console.error("Error deleting product:", error);
         }
@@ -96,13 +108,7 @@ const AdminProducts = () => {
     
 
     return (
-        <div style={{
-            backgroundImage: `url(${require("../assets/background.png")})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundAttachment: "fixed",
-            backgroundRepeat: "no-repeat"
-}}>
+        <div>
              <NavBar />
         <div className="admin-products-container">
             <h2>Admin Product Management</h2>

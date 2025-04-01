@@ -17,9 +17,9 @@ const ContactUs = () => {
           <p className="contact-spiced-text">
             Have questions or need assistance? Reach out to us!
           </p>
-          <p className="contact-spiced-detail"><strong>Email:</strong> support@spicesense.com</p>
-          <p className="contact-spiced-detail"><strong>Phone:</strong> +1 (555) 123-4567</p>
-          <p className="contact-spiced-detail"><strong>Address:</strong> 123 Spice Lane, Flavor Town, USA</p>
+          <p className="contact-spiced-detail"><strong>Email:</strong> info@mahathalaspices.com</p>
+          <p className="contact-spiced-detail"><strong>Phone:</strong> 076 240 2176</p>
+          <p className="contact-spiced-detail"><strong>Address:</strong> No. 16, Weliwaththa, Thotagamuwa, Matale</p>
         </div>
       </div>
     </div>
