@@ -154,7 +154,7 @@ const SupplierProducts = () => {
                 onChange={handleInputChange}
                 className="w-full p-2 border border-gray-300 rounded"
               >
-                <option value="">Select Category</option>
+                <option value="">Select</option>
                 <option value="Whole Spices">Whole Spices</option>
                 <option value="Ground Spices">Ground Spices</option>
                 <option value="Blended Spices">Blended Spices</option>
