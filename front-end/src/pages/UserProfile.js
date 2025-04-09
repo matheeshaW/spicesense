@@ -142,7 +142,7 @@ const UserProfile = () => {
       case "supplier":
         return (
           <>
-            <p className="profile-spiced-detail"><strong>Company Name:</strong> {userData.companyName}</p>
+            <p className="profile-spiced-detail"><strong>Company name:</strong> {userData.companyName}</p>
             <p className="profile-spiced-detail"><strong>warehouse location:</strong> {userData.contactPerson}</p>
           </>
         );
