@@ -13,8 +13,9 @@ import creditCardRoutes from "./routes/creditCards.js";
 import orderRoute from "./routes/order.js";
 import itemRoute from "./routes/item.js";
 import productRouter from "./routes/productRoutes.js"; // Import product routes
-import orderRouter from "./routes/orderRoutes.js";
-import deliveryRouter from "./routes/deliveryRoutes.js";
+import orderDeliveryRouter from "./routes/orderDeliveryRoutes.js";
+import shipmentDeliveryRouter from "./routes/shipmentDeliveryRoutes.js";
+
 
 import messageRouter from "./routes/messageRoutes.js"; 
 
@@ -73,8 +74,8 @@ app.use("/api/products", productRouter);
 app.use("/api/messages", messageRouter);
 
 
-app.use("/api/deliveries", deliveryRouter);
-app.use("/api/orderdelivers",orderRouter);
+app.use("/api/deliveries",shipmentDeliveryRouter );
+app.use("/api/orderdelivers",orderDeliveryRouter);
 
 
 // Test Cookie Endpoint

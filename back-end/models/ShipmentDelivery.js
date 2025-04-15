@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-const deliverySchema = new mongoose.Schema(
+const shipmentDeliverySchema = new mongoose.Schema(
   {
-    orderId: {
+    orderDeliveryId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "OrderDeliver",
+      ref: "OrderDelivery",
       required: true,
     },
     supplierId: {
@@ -44,10 +44,10 @@ const deliverySchema = new mongoose.Schema(
 );
 
 // Indexes for performance
-deliverySchema.index({ orderId: 1 });
-deliverySchema.index({ supplierId: 1, status: 1 });
-deliverySchema.index({ status: 1, expectedDeliveryDate: 1 });
+shipmentDeliverySchema.index({ orderDeliveryId: 1 });
+shipmentDeliverySchema.index({ supplierId: 1, status: 1 });
+shipmentDeliverySchema.index({ status: 1, expectedDeliveryDate: 1 });
 
-const Delivery = mongoose.model("Delivery", deliverySchema);
+const ShipmentDelivery = mongoose.model("ShipmentDelivery", shipmentDeliverySchema);
 
-export default Delivery;
+export default ShipmentDelivery;

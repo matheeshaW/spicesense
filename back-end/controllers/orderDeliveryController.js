@@ -1,9 +1,9 @@
-import OrderDeliver from "../models/orderModel.js";
+import OrderDelivery from "../models/OrderDelivery.js";
 import Message from "../models/messageModel.js";
-import Delivery from "../models/deliveryModel.js";
+import ShipmentDelivery from "../models/ShipmentDelivery.js";
 
 // Create order when supplier approves a message request
-export const createOrder = async (req, res) => {
+export const createOrderDelivery = async (req, res) => {
   try {
     const { messageId } = req.body;
     
@@ -44,7 +44,7 @@ export const createOrder = async (req, res) => {
     }
 
     // Check if an order already exists for this message
-    const existingOrder = await Order.findOne({ messageId });
+    const existingOrder = await OrderDelivery.findOne({ messageId });
     if (existingOrder) {
       return res.status(400).json({
         success: false,
@@ -56,7 +56,7 @@ export const createOrder = async (req, res) => {
     const totalPrice = message.approvedQuantity * message.approvedPrice;
 
     // Create the order
-    const newOrder = new OrderDeliver({
+    const newOrder = new OrderDelivery({
       adminId: message.adminId._id,
       supplierId: req.user.id,
       productId: message.productId._id,
@@ -84,26 +84,25 @@ export const createOrder = async (req, res) => {
 };
 
 // Get supplier's orders
-export const getSupplierOrders = async (req, res) => {
+export const getSupplierOrderDeliveries = async (req, res) => {
   try {
     const { status } = req.query;
     
     // Build filter
-    const filter = { 
-      supplierId: req.user.id, 
-      isActive: true 
-    };
-    
-    // Add status filter if provided
+    const filter = { supplierId: req.user.id, isActive: true };
     if (status && status !== "all") {
       filter.status = status;
     }
 
     // Get orders for this supplier
-    const orders = await OrderDeliver.find(filter)
+    const orders = await OrderDelivery.find(filter)
       .populate({
         path: "productId",
         select: "productName productCategory"
+      })
+      .populate({
+        path: "adminId",
+        select: "name email"
       })
       .sort({ createdAt: -1 });
 
@@ -115,13 +114,13 @@ export const getSupplierOrders = async (req, res) => {
     console.error("Error fetching supplier orders:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to load orders"
+      message: "Internal server error"
     });
   }
 };
 
 // Get admin's orders
-export const getAdminOrders = async (req, res) => {
+export const getAdminOrderDeliveries = async (req, res) => {
   try {
     // Verify the user is an admin
     if (req.user.role !== 'admin') {
@@ -143,7 +142,7 @@ export const getAdminOrders = async (req, res) => {
     }
 
     // Get orders
-    const orders = await Order.find(filter)
+    const orders = await OrderDelivery.find(filter)
       .populate({
         path: "productId",
         select: "productName productCategory"
@@ -168,11 +167,11 @@ export const getAdminOrders = async (req, res) => {
 };
 
 // Get order details
-export const getOrderDetails = async (req, res) => {
+export const getOrderDeliveryDetails = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderDeliveryId } = req.params;
     
-    const order = await Order.findById(orderId)
+    const order = await OrderDelivery.findById(orderDeliveryId)
       .populate({
         path: "productId",
         select: "productName productCategory price"
@@ -208,7 +207,7 @@ export const getOrderDetails = async (req, res) => {
     }
     
     // Get associated delivery if exists
-    const delivery = await Delivery.findOne({ orderId: order._id, isActive: true });
+    const delivery = await ShipmentDelivery.findOne({ orderDeliveryId: order._id, isActive: true });
     
     return res.status(200).json({
       success: true,
@@ -225,9 +224,9 @@ export const getOrderDetails = async (req, res) => {
 };
 
 // Update order status
-export const updateOrderStatus = async (req, res) => {
+export const updateOrderDeliveryStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderDeliveryId } = req.params;
     const { status, notes } = req.body;
     
     // Validate status
@@ -240,7 +239,7 @@ export const updateOrderStatus = async (req, res) => {
     }
     
     // Find the order
-    const order = await Order.findById(orderId);
+    const order = await OrderDelivery.findById(orderDeliveryId);
     
     if (!order || !order.isActive) {
       return res.status(404).json({
@@ -266,8 +265,8 @@ export const updateOrderStatus = async (req, res) => {
       updateData.notes = notes;
     }
     
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
+    const updatedOrder = await OrderDelivery.findByIdAndUpdate(
+      orderDeliveryId,
       updateData,
       { new: true, runValidators: true }
     )
@@ -279,12 +278,12 @@ export const updateOrderStatus = async (req, res) => {
     // If status is changed to "ready_for_shipment", create a delivery placeholder
     if (status === "ready_for_shipment" && order.status !== "ready_for_shipment") {
       // Check if a delivery already exists
-      const existingDelivery = await Delivery.findOne({ orderId: order._id, isActive: true });
+      const existingDelivery = await ShipmentDelivery.findOne({ orderDeliveryId: order._id, isActive: true });
       
       if (!existingDelivery) {
         // Create a new delivery
-        const newDelivery = new Delivery({
-          orderId: order._id,
+        const newDelivery = new ShipmentDelivery({
+          orderDeliveryId: order._id,
           supplierId: order.supplierId,
           status: "pending"
         });

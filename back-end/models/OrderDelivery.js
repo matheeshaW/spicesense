@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const orderDeliverSchema = new mongoose.Schema(
+const orderDeliverySchema = new mongoose.Schema(
   {
     adminId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -63,10 +63,10 @@ const orderDeliverSchema = new mongoose.Schema(
 );
 
 // Indexes for performance
-orderDeliverSchema.index({ supplierId: 1, status: 1 });
-orderDeliverSchema.index({ adminId: 1, status: 1 });
-orderDeliverSchema.index({ productId: 1 });
+orderDeliverySchema.index({ supplierId: 1, status: 1 });
+orderDeliverySchema.index({ adminId: 1, status: 1 });
+orderDeliverySchema.index({ productId: 1 });
 
-const OrderDeliver = mongoose.model("OrderDeliver", orderDeliverSchema);
+const OrderDelivery = mongoose.model("OrderDelivery", orderDeliverySchema);
 
-export default OrderDeliver;
+export default OrderDelivery;
