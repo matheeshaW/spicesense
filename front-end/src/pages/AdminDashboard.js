@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import UserManagement from "../components/UserManagement";
 import SupplierProducts from "../components/SupplierProducts";
 import AdminMessages from "../components/AdminMessages";
+import AdminDeliveries from "../components/AdminDeliveries"; // Add this import
 import "../Styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -63,6 +64,8 @@ const AdminDashboard = () => {
         return <SupplierProducts />;
       case "messages":
         return <AdminMessages />;
+      case "deliveries":  // Add this case
+        return <AdminDeliveries />;
       case "dashboard":
       default:
         return (
@@ -103,6 +106,17 @@ const AdminDashboard = () => {
                     className="ad-button ad-button-primary"
                   >
                     Manage Requests
+                  </button>
+                </div>
+                
+                <div className="ad-grid-item">
+                  <h3 className="ad-grid-item-title">Delivery Tracking</h3>
+                  <p className="ad-grid-item-text">Monitor shipments and deliveries from suppliers.</p>
+                  <button 
+                    onClick={() => switchTab("deliveries")}
+                    className="ad-button ad-button-primary"
+                  >
+                    Track Deliveries
                   </button>
                 </div>
               </div>
@@ -159,14 +173,14 @@ const AdminDashboard = () => {
                       User Management
                     </button>
                   </li>
-                  {/* <li>
+                  { <li>
                     <button
                       onClick={() => switchTab("suppliers")}
                       className={`ad-nav-button ${activeTab === "suppliers" ? "ad-nav-button-active" : ""}`}
                     >
                       Suppliers
                     </button>
-                  </li> */}
+                  </li> }
                   <li>
                     <button
                       onClick={() => switchTab("messages")}
@@ -174,6 +188,7 @@ const AdminDashboard = () => {
                     >
                       Product Requests
                     </button>
+                    
                   </li>
                   <li>
                     <button
@@ -187,6 +202,14 @@ const AdminDashboard = () => {
                       className="ad-nav-button"
                     >
                       Orders
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => switchTab("deliveries")}
+                      className={`ad-nav-button ${activeTab === "deliveries" ? "ad-nav-button-active" : ""}`}
+                    >
+                      Deliveries
                     </button>
                   </li>
                   <li>
