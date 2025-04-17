@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import UserManagement from "../components/UserManagement";
 import SupplierProducts from "../components/SupplierProducts";
 import AdminMessages from "../components/AdminMessages";
-import AdminDeliveries from "../components/AdminDeliveries"; // Add this import
+import AdminDeliveries from "../components/AdminDeliveries";
 import "../Styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
         return <SupplierProducts />;
       case "messages":
         return <AdminMessages />;
-      case "deliveries":  // Add this case
+      case "deliveries":
         return <AdminDeliveries />;
       case "dashboard":
       default:
@@ -188,7 +188,6 @@ const AdminDashboard = () => {
                     >
                       Product Requests
                     </button>
-                    
                   </li>
                   <li>
                     <button
