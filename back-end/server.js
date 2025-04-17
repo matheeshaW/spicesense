@@ -15,6 +15,8 @@ import itemRoute from "./routes/item.js";
 import productRouter from "./routes/productRoutes.js"; // Import product routes
 import orderDeliveryRouter from "./routes/orderDeliveryRoutes.js";
 import shipmentDeliveryRouter from "./routes/shipmentDeliveryRoutes.js";
+import transactionRouter from "./routes/transactionRoutes.js";
+
 
 
 
@@ -79,6 +81,8 @@ app.use("/api/messages", messageRouter);
 
 app.use("/api/orderdelivers", orderDeliveryRouter);
 app.use("/api/deliveries", shipmentDeliveryRouter);
+
+app.use("/api/transactions", transactionRouter);
 
 
 // Test Cookie Endpoint

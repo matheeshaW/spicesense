@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SupplierMessages from "../components/SupplierMessages";
 import SupplierOrders from "../components/SupplierOrders";
 import SupplierDeliveries from "../components/SupplierDeliveries";
+import SupplierTransactions from "../components/SupplierTransactions";
 import "../Styles/SupplierDashboard.css"; 
 
 const SupplierDashboard = () => {
