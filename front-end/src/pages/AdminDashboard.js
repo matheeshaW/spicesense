@@ -5,6 +5,7 @@ import UserManagement from "../components/UserManagement";
 import SupplierProducts from "../components/SupplierProducts";
 import AdminMessages from "../components/AdminMessages";
 import AdminDeliveries from "../components/AdminDeliveries";
+import AdminTransactions from "../components/AdminTransactions"; // Added missing import
 import "../Styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
@@ -66,6 +67,8 @@ const AdminDashboard = () => {
         return <AdminMessages />;
       case "deliveries":
         return <AdminDeliveries />;
+      case "transactions": // Added missing case
+        return <AdminTransactions />;
       case "dashboard":
       default:
         return (
@@ -222,14 +225,14 @@ const AdminDashboard = () => {
                     </button>
                   </li>
                   <li>
+                    <button
+                      onClick={() => switchTab("transactions")}
+                      className={`ad-nav-button ${activeTab === "transactions" ? "ad-nav-button-active" : ""}`}
+                    >
+                      Transactions
+                    </button>
+                  </li>
                   <li>
-      <button
-        onClick={() => switchTab("transactions")}
-        className={`ad-nav-button ${activeTab === "transactions" ? "ad-nav-button-active" : ""}`}
-      >
-        Transactions
-      </button>
-    </li>
                     <button
                       className="ad-nav-button"
                     >
