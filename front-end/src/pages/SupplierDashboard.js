@@ -219,6 +219,12 @@ const SupplierDashboard = () => {
             >
               Deliveries
             </button>
+            <button
+              onClick={() => switchTab("transactions")}
+              className={`sd-tab-btn ${activeTab === "transactions" ? "sd-tab-active" : ""}`}
+            >
+              Transactions
+            </button>
             <button onClick={handleLogout} className="sd-logout-btn">
               Logout
             </button>
@@ -271,6 +277,8 @@ const SupplierDashboard = () => {
               <SupplierOrders />
             ) : activeTab === "deliveries" ? (
               <SupplierDeliveries />
+            ) : activeTab === "transactions" ? (
+              <SupplierTransactions />
             ) : (
               <>
                 <div className="sd-product-management">

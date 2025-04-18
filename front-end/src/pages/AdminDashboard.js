@@ -119,6 +119,16 @@ const AdminDashboard = () => {
                     Track Deliveries
                   </button>
                 </div>
+                <div className="ad-grid-item">
+                  <h3 className="ad-grid-item-title">Financial Transactions</h3>
+                  <p className="ad-grid-item-text">Manage payments and invoices for suppliers.</p>
+                  <button 
+                    onClick={() => switchTab("transactions")}
+                    className="ad-button ad-button-primary"
+                  >
+                    Manage Transactions
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -212,6 +222,14 @@ const AdminDashboard = () => {
                     </button>
                   </li>
                   <li>
+                  <li>
+      <button
+        onClick={() => switchTab("transactions")}
+        className={`ad-nav-button ${activeTab === "transactions" ? "ad-nav-button-active" : ""}`}
+      >
+        Transactions
+      </button>
+    </li>
                     <button
                       className="ad-nav-button"
                     >
