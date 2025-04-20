@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+
 const SupplierProducts = () => {
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -64,7 +65,6 @@ const SupplierProducts = () => {
       ...formData,
       [name]: value
     });
-
   
     setFormErrors({ ...formErrors, [name]: "" });
   };
@@ -125,13 +125,13 @@ const SupplierProducts = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="supplier-container">
       {showEditForm && (
-        <div className="bg-amber-50 p-4 rounded-lg mb-6">
-          <h3 className="text-lg font-semibold text-amber-700 mb-4">Edit Product</h3>
-          <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="supplier-edit-form">
+          <h3 className="supplier-edit-title">Edit Product</h3>
+          <form onSubmit={handleUpdate} className="supplier-form-grid">
+            <div className="supplier-form-group">
+              <label className="supplier-label">
                 Product Name *
               </label>
               <input
@@ -139,20 +139,20 @@ const SupplierProducts = () => {
                 name="productName"
                 value={formData.productName}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="supplier-input"
               />
-              {formErrors.productName && <p className="text-red-500 text-xs">{formErrors.productName}</p>}
+              {formErrors.productName && <p className="supplier-error">{formErrors.productName}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="supplier-form-group">
+              <label className="supplier-label">
                 Product Category *
               </label>
               <select
                 name="productCategory"
                 value={formData.productCategory}
                 onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="supplier-select"
               >
                 <option value="">Select</option>
                 <option value="Whole Spices">Whole Spices</option>
@@ -163,11 +163,11 @@ const SupplierProducts = () => {
                 <option value="Exotic Spices">Exotic Spices</option>
                 <option value="Organic Spices">Organic Spices</option>
               </select>
-              {formErrors.productCategory && <p className="text-red-500 text-xs">{formErrors.productCategory}</p>}
+              {formErrors.productCategory && <p className="supplier-error">{formErrors.productCategory}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="supplier-form-group">
+              <label className="supplier-label">
                 Price (Rs) *
               </label>
               <input
@@ -176,13 +176,13 @@ const SupplierProducts = () => {
                 value={formData.price}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="supplier-input"
               />
-              {formErrors.price && <p className="text-red-500 text-xs">{formErrors.price}</p>}
+              {formErrors.price && <p className="supplier-error">{formErrors.price}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="supplier-form-group">
+              <label className="supplier-label">
                 Stock Quantity *
               </label>
               <input
@@ -191,13 +191,13 @@ const SupplierProducts = () => {
                 value={formData.stockQuantity}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="supplier-input"
               />
-              {formErrors.stockQuantity && <p className="text-red-500 text-xs">{formErrors.stockQuantity}</p>}
+              {formErrors.stockQuantity && <p className="supplier-error">{formErrors.stockQuantity}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="supplier-form-group">
+              <label className="supplier-label">
                 Minimum Order Quantity *
               </label>
               <input
@@ -206,13 +206,13 @@ const SupplierProducts = () => {
                 value={formData.minimumOrderQuantity}
                 onChange={handleInputChange}
                 min="1"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="supplier-input"
               />
-              {formErrors.minimumOrderQuantity && <p className="text-red-500 text-xs">{formErrors.minimumOrderQuantity}</p>}
+              {formErrors.minimumOrderQuantity && <p className="supplier-error">{formErrors.minimumOrderQuantity}</p>}
             </div>
 
-            <div className="md:col-span-2 flex gap-3 justify-end mt-4">
-              <button type="submit" className="bg-amber-600 text-white px-4 py-2 rounded">Update Product</button>
+            <div className="supplier-form-actions">
+              <button type="submit" className="supplier-update-button">Update Product</button>
             </div>
           </form>
         </div>
