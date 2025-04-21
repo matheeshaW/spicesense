@@ -15,6 +15,18 @@ const SupplierDashboard = () => {
   const [products, setProducts] = useState([]);
   const [editProduct, setEditProduct] = useState(null);
   const [activeTab, setActiveTab] = useState("products");
+  const [availableProducts, setAvailableProducts] = useState([]);
+
+  // Predefined product lists by category
+  const productsByCategory = {
+    "Whole Spices": ["Black Pepper", "Cardamom", "Cinnamon", "Cloves", "Cumin Seeds", "Fennel Seeds"],
+    "Ground Spices": ["Ground Turmeric", "Ground Cumin", "Ground Coriander", "Ground Cinnamon", "Ground Cardamom"],
+    "Blended Spices": ["Garam Masala", "Curry Powder", "Chaat Masala", "Tandoori Masala", "Biryani Masala"],
+    "Herbs": ["Basil", "Oregano", "Rosemary", "Thyme", "Mint", "Coriander Leaves"],
+    "Seasoning Mixes": ["Italian Seasoning", "BBQ Rub", "Mexican Seasoning", "Cajun Spice Mix"],
+    "Exotic Spices": ["Saffron", "Star Anise", "Vanilla Beans", "Sumac", "Za'atar"],
+    "Organic Spices": ["Organic Turmeric", "Organic Ginger", "Organic Cinnamon", "Organic Cloves"]
+  };
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -61,6 +73,28 @@ const SupplierDashboard = () => {
     fetchUserData();
   }, [navigate, location.state]);
 
+  // Update available products when category changes
+  useEffect(() => {
+    if (formData.productCategory) {
+      // Get products from the selected category
+      const categoryProducts = productsByCategory[formData.productCategory] || [];
+      
+      // Filter out products that are already added
+      const alreadyAddedProductNames = products
+        .filter(product => product.productCategory === formData.productCategory)
+        .map(product => product.productName);
+      
+      // Set available products, excluding already added ones
+      const filteredProducts = categoryProducts.filter(
+        product => !alreadyAddedProductNames.includes(product)
+      );
+      
+      setAvailableProducts(filteredProducts);
+    } else {
+      setAvailableProducts([]);
+    }
+  }, [formData.productCategory, products]);
+
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/products/supplier", {
@@ -91,10 +125,29 @@ const SupplierDashboard = () => {
       ...formData,
       [name]: value
     });
+
+    // If changing product category, reset product name
+    if (name === "productCategory") {
+      setFormData(prev => ({
+        ...prev,
+        productName: ""
+      }));
+    }
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check for duplicate products
+    const isDuplicate = products.some(product => 
+      product.productName === formData.productName &&
+      (editProduct ? product._id !== editProduct._id : true)
+    );
+    
+    if (isDuplicate) {
+      setError("You have already added this product. Please choose a different one.");
+      return; // Prevent form submission
+    }
     
     try {
       if (editProduct) {
@@ -302,17 +355,6 @@ const SupplierDashboard = () => {
                       </h3>
                       <div className="sd-form-grid">
                         <div className="sd-form-group">
-                          <label className="sd-form-label">Product Name *</label>
-                          <input
-                            type="text"
-                            name="productName"
-                            value={formData.productName}
-                            onChange={handleInputChange}
-                            required
-                            className="sd-input"
-                          />
-                        </div>
-                        <div className="sd-form-group">
                           <label className="sd-form-label">Product Category *</label>
                           <select
                             name="productCategory"
@@ -331,6 +373,50 @@ const SupplierDashboard = () => {
                             <option value="Organic Spices">Organic Spices</option>
                           </select>
                         </div>
+                        
+                        <div className="sd-form-group">
+                          <label className="sd-form-label">Product Name *</label>
+                          {editProduct ? (
+                            // If editing, show the product name as read-only
+                            <input
+                              type="text"
+                              name="productName"
+                              value={formData.productName}
+                              className="sd-input"
+                              readOnly
+                            />
+                          ) : (
+                            // If adding new product, show dropdown based on category
+                            formData.productCategory ? (
+                              <select
+                                name="productName"
+                                value={formData.productName}
+                                onChange={handleInputChange}
+                                required
+                                className="sd-input"
+                              >
+                                <option value="">Select Product</option>
+                                {availableProducts.map((product, index) => (
+                                  <option key={index} value={product}>
+                                    {product}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type="text"
+                                name="productName"
+                                value={formData.productName}
+                                onChange={handleInputChange}
+                                required
+                                className="sd-input"
+                                placeholder="First select a category"
+                                disabled
+                              />
+                            )
+                          )}
+                        </div>
+                        
                         <div className="sd-form-group">
                           <label className="sd-form-label">Price (Rs) *</label>
                           <input

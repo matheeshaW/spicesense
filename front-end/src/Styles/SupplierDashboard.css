@@ -74,6 +74,13 @@
     background: var(--sd-paprika);
     color: #fff;
   }
+
+  /* Scrollable dropdown for Product Name */
+.supplier-form-group {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
   
   .sd-logout-btn {
     background: var(--sd-cinnamon);
