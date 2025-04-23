@@ -29,6 +29,7 @@ import ExpiryAlerts from "./pages/ExpiryAlerts.js";
 import InventoryTransactions from "./pages/InventoryTransactions.js";
 import SearchFilter from "./pages/SearchFilter.js";
 import AdminProducts from "./pages/AdminProducts.js";
+import AccountManagement from "./pages/AccountManagement"; // Import new component
 
 
 function App() {
@@ -68,7 +69,8 @@ function App() {
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
           <Route path="/search-filter" element={<SearchFilter />} />
           <Route path="/admin-products" element={<AdminProducts />} />
-
+          <Route path="/account-management" element={<AccountManagement />} /> {/* New route */}
+          
       </Routes>
     </Router>
     </CookiesProvider>

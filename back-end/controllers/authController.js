@@ -110,6 +110,11 @@ export const login = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid email" });
     }
 
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(403).json({ success: false, message: "Account is deactivated. Please contact an admin." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: "Invalid password" });
@@ -117,13 +122,11 @@ export const login = async (req, res) => {
 
     // Check if account is verified
     if (!user.isAccountVerified) {
-      // Generate OTP if not verified
       const otp = String(Math.floor(100000 + Math.random() * 900000));
       user.verifyOtp = otp;
-      user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours expiry
+      user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
       await user.save();
 
-      // Send OTP email
       const mailOptions = {
         from: `SpiceSense <${process.env.SENDER_EMAIL}>`,
         to: user.email,
@@ -140,7 +143,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // If verified, generate JWT token
     const token = jwt.sign(
       { id: user._id.toString(), role: user.role, email: user.email },
       process.env.JWT_SECRET,
@@ -153,7 +155,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
     res.cookie("token", token, cookieOptions);

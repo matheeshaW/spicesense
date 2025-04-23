@@ -1,4 +1,3 @@
-// AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -58,6 +57,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "users":
         return <UserManagement />;
+      case "account-management":
+        return navigate("/account-management"); // Navigate to new page
       case "dashboard":
       default:
         return (
@@ -76,6 +77,17 @@ const AdminDashboard = () => {
                     className="spice-action-btn"
                   >
                     Manage Users
+                  </button>
+                </div>
+                
+                <div className="spice-grid-item">
+                  <h3 className="spice-grid-title">Account Management</h3>
+                  <p className="spice-grid-desc">Activate or deactivate user accounts.</p>
+                  <button 
+                    onClick={() => switchTab("account-management")}
+                    className="spice-action-btn"
+                  >
+                    Manage Accounts
                   </button>
                 </div>
                 
@@ -163,6 +175,16 @@ const AdminDashboard = () => {
                       }`}
                     >
                       User Management
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => switchTab("account-management")}
+                      className={`spice-nav-item ${
+                        activeTab === "account-management" ? "spice-nav-active" : ""
+                      }`}
+                    >
+                      Account Management
                     </button>
                   </li>
                   <li>

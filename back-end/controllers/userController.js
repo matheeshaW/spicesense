@@ -31,16 +31,13 @@ export const getUserData = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    // is an admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
 
-  
     const users = await userModel.find().select("-password -verifyOtp -resetOtp -resetOtpExpireAt");
     
     return res.json({ success: true, users });
-
   } catch (error) {
     console.error("getAllUsers error:", error.message);
     return res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -49,23 +46,19 @@ export const getAllUsers = async (req, res) => {
 
 export const getUsersByRole = async (req, res) => {
   try {
-    // Verify  admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
 
     const { role } = req.params;
     
-    // Validate role
     if (!['admin', 'supplier', 'customer', 'employee'].includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role specified" });
     }
 
-    
     const users = await userModel.find({ role }).select("-password -verifyOtp -resetOtp -resetOtpExpireAt");
     
     return res.json({ success: true, users });
-
   } catch (error) {
     console.error("getUsersByRole error:", error.message);
     return res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -281,6 +274,77 @@ export const updateUserProfile = async (req, res) => {
     if (error.name === 'ValidationError') {
       return res.status(400).json({ success: false, message: error.message });
     }
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+// Add this to userController.js
+export const toggleAccountStatus = async (req, res) => {
+  try {
+    // Verify that the requester is an admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: "Access denied. Admin only." });
+    }
+
+    const { userId } = req.params;
+    const { isActive } = req.body; // Expect isActive: true or false
+
+    // Find the user
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Prevent deactivating the only admin
+    if (user.role === 'admin' && !isActive) {
+      const adminCount = await userModel.countDocuments({ role: 'admin', isActive: true });
+      if (adminCount <= 1) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot deactivate the only active admin account",
+        });
+      }
+    }
+
+    // Update the isActive status
+    user.isActive = isActive;
+    await user.save();
+
+    // Send email notification
+    const action = isActive ? "activated" : "deactivated";
+    const mailOptions = {
+      from: `SpiceSense <${process.env.SENDER_EMAIL}>`,
+      to: user.email,
+      subject: `Your Account Has Been ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+      text: `Dear ${user.name},\n\nYour SpiceSense account has been ${action} by an administrator.\n\n${
+        isActive
+          ? "You can now log in to your account."
+          : "Please contact support if you believe this is an error."
+      }\n\nRegards,\nSpiceSense Team`,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Account ${action} notification email sent`);
+    } catch (emailError) {
+      console.error("Error sending email notification:", emailError);
+      // Continue even if email fails
+    }
+
+    return res.json({
+      success: true,
+      message: `User account ${action} successfully`,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+      },
+    });
+  } catch (error) {
+    console.error("toggleAccountStatus error:", error.message);
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
