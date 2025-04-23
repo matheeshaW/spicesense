@@ -90,16 +90,7 @@ const AdminDashboard = () => {
                   </button>
                 </div>
                 
-                <div className="ad-grid-item">
-                  <h3 className="ad-grid-item-title">Supplier Products</h3>
-                  <p className="ad-grid-item-text">Browse and manage supplier products.</p>
-                  <button 
-                    onClick={() => switchTab("suppliers")}
-                    className="ad-button ad-button-primary"
-                  >
-                    View Products
-                  </button>
-                </div>
+               
                 
                 <div className="ad-grid-item">
                   <h3 className="ad-grid-item-title">Product Requests</h3>
@@ -186,15 +177,8 @@ const AdminDashboard = () => {
                       User Management
                     </button>
                   </li>
-                  { <li>
-                    <button
-                      onClick={() => switchTab("suppliers")}
-                      className={`ad-nav-button ${activeTab === "suppliers" ? "ad-nav-button-active" : ""}`}
-                    >
-                      Suppliers
-                    </button>
-                  </li> }
-                  <li>
+
+                  <li> 
                     <button
                       onClick={() => switchTab("messages")}
                       className={`ad-nav-button ${activeTab === "messages" ? "ad-nav-button-active" : ""}`}
