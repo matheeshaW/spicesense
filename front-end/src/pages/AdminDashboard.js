@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import UserManagement from "../components/UserManagement";
-import "../Styles/AdminNav.css"; // Import the custom CSS
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import "../Styles/AdminNav.css";
 
 const AdminDashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -17,12 +19,14 @@ const AdminDashboard = () => {
         const passedUserData = location.state?.userData;
         if (passedUserData) {
           setUserData(passedUserData);
+          console.log("AdminDashboard: Loaded userData from location.state:", passedUserData);
           return;
         }
 
         const response = await axios.get("http://localhost:5000/api/user/data", {
           withCredentials: true,
         });
+        console.log("AdminDashboard: Fetch user data response:", response.data);
 
         if (response.data.success) {
           setUserData(response.data.userData);
@@ -50,7 +54,71 @@ const AdminDashboard = () => {
   };
 
   const switchTab = (tab) => {
+    console.log("AdminDashboard: Switching to tab:", tab);
     setActiveTab(tab);
+  };
+
+  const generateUserSummaryReport = async () => {
+    try {
+      console.log("Fetching report data...");
+      const response = await axios.get("http://localhost:5000/api/user/reports/summary", {
+        withCredentials: true,
+      });
+      console.log("User Summary Report response:", response.data);
+
+      if (response.data.success) {
+        const { summary } = response.data;
+        console.log("Summary data:", summary);
+
+        // Initialize jsPDF
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        console.log("jsPDF instance created:", doc);
+
+        // Verify autoTable
+        if (!doc.autoTable) {
+          autoTable(doc);
+          console.log("autoTable applied to jsPDF instance");
+        }
+
+        // Add content
+        doc.setFontSize(18);
+        doc.text("User Summary Report", 14, 20);
+        doc.setFontSize(12);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+        doc.text(`Admin: ${userData?.name || "Unknown"} (${userData?.email || "Unknown"})`, 14, 40);
+
+        // Define table data with fallback values
+        const tableData = [
+          ["Total Users", summary?.total || 0],
+          ["Admins", summary?.admins || 0],
+          ["Suppliers", summary?.suppliers || 0],
+          ["Customers", summary?.customers || 0],
+          ["Employees", summary?.employees || 0],
+          ["Active Users", summary?.active || 0],
+          ["Deactivated Users", summary?.deactivated || 0],
+        ];
+
+        // Add table with minimal configuration
+        doc.autoTable({
+          startY: 50,
+          head: [["Metric", "Count"]],
+          body: tableData,
+          theme: "grid",
+        });
+
+        console.log("Saving PDF...");
+        doc.save(`User_Summary_Report_${new Date().toISOString().split("T")[0]}.pdf`);
+      } else {
+        setError(response.data.message || "Failed to fetch report data.");
+      }
+    } catch (error) {
+      console.error("Error generating report:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      setError(error.message || "Failed to generate report. Please try again.");
+    }
   };
 
   const renderContent = () => {
@@ -58,7 +126,8 @@ const AdminDashboard = () => {
       case "users":
         return <UserManagement />;
       case "account-management":
-        return navigate("/account-management"); // Navigate to new page
+        console.log("AdminDashboard: Navigating to /account-management");
+        return navigate("/account-management");
       case "dashboard":
       default:
         return (
@@ -109,6 +178,17 @@ const AdminDashboard = () => {
                     View Orders
                   </button>
                 </div>
+                
+                <div className="spice-grid-item">
+                  <h3 className="spice-grid-title">Reports</h3>
+                  <p className="spice-grid-desc">Generate user summary report.</p>
+                  <button 
+                    onClick={generateUserSummaryReport}
+                    className="spice-action-btn"
+                  >
+                    Generate User Summary Report
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -118,7 +198,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="spice-dashboard-container">
-      {/* Navigation Bar */}
       <nav className="spice-nav">
         <div className="spice-nav-logo">
           <div className="spice-logo-circle">
@@ -139,7 +218,6 @@ const AdminDashboard = () => {
         </div>
       </nav>
 
-      {/* Rest of the Dashboard */}
       <div className="spice-content-wrapper">
         {error ? (
           <div className="spice-error-message">
@@ -147,7 +225,6 @@ const AdminDashboard = () => {
           </div>
         ) : userData ? (
           <div className="spice-main-layout">
-            {/* Sidebar */}
             <div className="spice-sidebar">
               <div className="spice-user-info">
                 <p className="spice-user-label">Logged in as:</p>
@@ -209,7 +286,6 @@ const AdminDashboard = () => {
               </nav>
             </div>
             
-            {/* Main Content */}
             <div className="spice-content">
               {renderContent()}
             </div>

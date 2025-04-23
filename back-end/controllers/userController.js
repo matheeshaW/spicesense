@@ -349,6 +349,39 @@ export const toggleAccountStatus = async (req, res) => {
   }
 };
 
+export const getUserSummaryReport = async (req, res) => {
+  try {
+    console.log("getUserSummaryReport: User role:", req.user.role);
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied. Admin only." });
+    }
+
+    const total = await userModel.countDocuments();
+    const admins = await userModel.countDocuments({ role: "admin" });
+    const suppliers = await userModel.countDocuments({ role: "supplier" });
+    const customers = await userModel.countDocuments({ role: "customer" });
+    const employees = await userModel.countDocuments({ role: "employee" });
+    const active = await userModel.countDocuments({ isActive: true });
+    const deactivated = await userModel.countDocuments({ isActive: false });
+
+    const summary = {
+      total,
+      admins,
+      suppliers,
+      customers,
+      employees,
+      active,
+      deactivated,
+    };
+
+    console.log("getUserSummaryReport: Summary:", summary);
+    return res.json({ success: true, summary });
+  } catch (error) {
+    console.error("getUserSummaryReport error:", error.message);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 
 
 

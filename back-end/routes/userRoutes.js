@@ -6,7 +6,8 @@ import {
   updateUser, 
   deleteUser, 
   updateUserProfile,
-  toggleAccountStatus
+  toggleAccountStatus,
+  getUserSummaryReport
 } from '../controllers/userController.js';
 import userAuth from '../middleware/userAuth.js';
 
@@ -22,5 +23,6 @@ userRouter.put('/update/:userId', userAuth, updateUser); // Update a user (admin
 userRouter.delete('/delete/:userId', userAuth, deleteUser); // Delete a user (admin only)
 userRouter.put('/update-profile', userAuth, updateUserProfile);
 userRouter.put('/toggle-status/:userId', userAuth,toggleAccountStatus);
+userRouter.get("/reports/summary", userAuth, getUserSummaryReport); 
 
 export default userRouter;
