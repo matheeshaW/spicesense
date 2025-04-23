@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import '../Styles/auth.css'; // Import the CSS
+import '../Styles/auth.css';
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -102,8 +102,9 @@ const Register = () => {
       const response = await axios.post("http://localhost:5000/api/auth/register", userData);
 
       if (response.data.success) {
-        alert("Registration successful! Please log in.");
-        navigate("/login");
+        alert("Registration successful! Please verify your email.");
+        sessionStorage.setItem("userId", response.data.userId);
+        navigate("/verify-account");
       } else {
         setError(response.data.message);
       }
@@ -203,7 +204,7 @@ const Register = () => {
             >
               <option value="customer">Customer</option>
               <option value="supplier">Supplier</option>
-             <option value="admin">Admin</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 

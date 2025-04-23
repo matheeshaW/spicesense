@@ -40,34 +40,35 @@ function App() {
     <CookiesProvider>
     <Router>
       <Routes>
-        <Route path="/login2" element={<LoginPage />} /> {/* remove this login */}
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/credit-cards" element={<CreditCardPage />} />
-        <Route path="/home2" element={<HomePage />} />
-        <Route path="/item/:id" element={<ItemPage />} />
-        <Route path="/order/:id" element={<OrderProcessingPage />} />
-        <Route path="/confirm/:orderId" element={<OrderConfirmationPage />} />
-        <Route path="/welcome" element={<Welcome />} />
+      <Route path="/login2" element={<LoginPage />} /> {/* Consider removing if not needed */}
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/credit-cards" element={<CreditCardPage />} />
+          <Route path="/home2" element={<HomePage />} />
+          <Route path="/item/:id" element={<ItemPage />} />
+          <Route path="/order/:id" element={<OrderProcessingPage />} />
+          <Route path="/confirm/:orderId" element={<OrderConfirmationPage />} />
+          <Route path="/welcome" element={<Welcome />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Welcome />} /> {/* Updated Home for customers */}
+          <Route path="/" element={<Welcome />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/verify-account" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/user-profile" element={<UserProfile />} />
+         <Route path="/user-profile" element={<UserProfile />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/supplier-dashboard" element={<SupplierDashboard/>} />
-          <Route path="/employee-dashboard" element={<EmployeeDashboard/>} />
+          <Route path="/supplier-dashboard" element={<SupplierDashboard />} />
+          <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
           <Route path="/send-reset-otp" element={<SendResetOtp />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
-          <Route path="/inventory-overview" element={<InventoryOverview />}></Route>
-        <Route path="/stock-levels" element={<StockLevels />}></Route>
-        <Route path="/expiry-alerts" element={<ExpiryAlerts />}></Route>
-        <Route path="/inventory-transactions" element={<InventoryTransactions />}></Route>
-        <Route path="/search-filter" element={<SearchFilter />}></Route>
-        <Route path="/admin-products" element={<AdminProducts />}></Route>
+          <Route path="/inventory-overview" element={<InventoryOverview />} />
+          <Route path="/stock-levels" element={<StockLevels />} />
+          <Route path="/expiry-alerts" element={<ExpiryAlerts />} />
+          <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+          <Route path="/search-filter" element={<SearchFilter />} />
+          <Route path="/admin-products" element={<AdminProducts />} />
+
       </Routes>
     </Router>
     </CookiesProvider>
