@@ -93,7 +93,6 @@ const AdminDashboard = () => {
           ["Admins", summary?.admins || 0],
           ["Suppliers", summary?.suppliers || 0],
           ["Customers", summary?.customers || 0],
-          ["Employees", summary?.employees || 0],
           ["Active Users", summary?.active || 0],
           ["Deactivated Users", summary?.deactivated || 0],
         ];
