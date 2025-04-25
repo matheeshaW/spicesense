@@ -27,8 +27,18 @@ const AdminTransactions = () => {
   const [updateFormData, setUpdateFormData] = useState({
     status: "",
     paymentReference: "",
-    notes: ""
+    notes: "",
+    paymentMethod: ""
   });
+  
+  // Define payment methods
+  const paymentMethods = [
+    { value: "bank_transfer", label: "Bank Transfer", refLabel: "Transaction ID/Reference Number" },
+    { value: "cash", label: "Cash", refLabel: "Receipt Number" },
+    { value: "check", label: "Check", refLabel: "Check Number" },
+    { value: "company_credit", label: "Company Credit", refLabel: "Credit Reference" },
+    { value: "online_payment", label: "Online Payment", refLabel: "Payment ID" }
+  ];
   
   useEffect(() => {
     fetchTransactions();
@@ -184,6 +194,7 @@ const AdminTransactions = () => {
     setActiveTransaction(transaction);
     setUpdateFormData({
       status: "",
+      paymentMethod: transaction.paymentMethod || "bank_transfer",
       paymentReference: transaction.paymentReference || "",
       notes: transaction.notes || ""
     });
@@ -214,9 +225,15 @@ const AdminTransactions = () => {
     }
     
     try {
+      // Include the payment method in the update
+      const dataToUpdate = {
+        ...updateFormData,
+        paymentMethod: updateFormData.paymentMethod || activeTransaction.paymentMethod
+      };
+      
       const response = await axios.put(
         `http://localhost:5000/api/transactions/${activeTransaction._id}/status`,
-        updateFormData,
+        dataToUpdate,
         { withCredentials: true }
       );
       
@@ -264,14 +281,13 @@ const AdminTransactions = () => {
   };
   
   const getPaymentMethodLabel = (method) => {
-    switch (method) {
-      case "bank_transfer": return "Bank Transfer";
-      case "credit_card": return "Credit Card";
-      case "check": return "Check";
-      case "cash": return "Cash";
-      case "online_payment": return "Online Payment";
-      default: return method;
-    }
+    const foundMethod = paymentMethods.find(m => m.value === method);
+    return foundMethod ? foundMethod.label : method;
+  };
+  
+  const getPaymentReferenceLabel = (method) => {
+    const foundMethod = paymentMethods.find(m => m.value === method);
+    return foundMethod ? foundMethod.refLabel : "Payment Reference";
   };
   
   const formatDate = (dateString) => {
@@ -426,6 +442,7 @@ const AdminTransactions = () => {
                   <th>Supplier</th>
                   <th>Product</th>
                   <th>Amount</th>
+                  <th>Payment Method</th>
                   <th>Due Date</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -441,6 +458,7 @@ const AdminTransactions = () => {
                     </td>
                     <td>{transaction.orderDeliveryId?.productId?.productName || "Unknown Product"}</td>
                     <td>{formatCurrency(transaction.amount)}</td>
+                    <td>{getPaymentMethodLabel(transaction.paymentMethod)}</td>
                     <td>{formatDate(transaction.dueDate)}</td>
                     <td>
                       <span className={`at-status ${getStatusClass(transaction.status)}`}>
@@ -527,11 +545,11 @@ const AdminTransactions = () => {
                     required
                     className="at-form-select"
                   >
-                    <option value="bank_transfer">Bank Transfer</option>
-                    <option value="credit_card">Credit Card</option>
-                    <option value="check">Check</option>
-                    <option value="cash">Cash</option>
-                    <option value="online_payment">Online Payment</option>
+                    {paymentMethods.map(method => (
+                      <option key={method.value} value={method.value}>
+                        {method.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 
@@ -630,14 +648,32 @@ const AdminTransactions = () => {
                 </div>
                 
                 <div className="at-form-group">
-                  <label className="at-form-label">Payment Reference</label>
+                  <label className="at-form-label">Payment Method</label>
+                  <select
+                    name="paymentMethod"
+                    value={updateFormData.paymentMethod}
+                    onChange={handleUpdateInputChange}
+                    className="at-form-select"
+                  >
+                    {paymentMethods.map(method => (
+                      <option key={method.value} value={method.value}>
+                        {method.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="at-form-group">
+                  <label className="at-form-label">
+                    {getPaymentReferenceLabel(updateFormData.paymentMethod)}
+                  </label>
                   <input
                     type="text"
                     name="paymentReference"
                     value={updateFormData.paymentReference}
                     onChange={handleUpdateInputChange}
                     className="at-form-input"
-                    placeholder="Transaction ID, check number, etc."
+                    placeholder={getPaymentReferenceLabel(updateFormData.paymentMethod)}
                   />
                 </div>
                 
@@ -735,7 +771,7 @@ const AdminTransactions = () => {
                   )}
                   {activeTransaction.paymentReference && (
                     <div className="at-detail-group">
-                      <p className="at-detail-label">Payment Reference:</p>
+                      <p className="at-detail-label">{getPaymentReferenceLabel(activeTransaction.paymentMethod)}:</p>
                       <p className="at-detail-value">{activeTransaction.paymentReference}</p>
                     </div>
                   )}
