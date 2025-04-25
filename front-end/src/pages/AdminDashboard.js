@@ -93,8 +93,22 @@ const AdminDashboard = () => {
                 <div className="spice-grid-item">
                   <h3 className="spice-grid-title">Orders</h3>
                   <p className="spice-grid-desc">View and manage customer orders.</p>
-                  <button className="spice-action-btn">
+                  <button 
+                    onClick={() => navigate("/orders")} // Assuming /orders route exists
+                    className="spice-action-btn"
+                  >
                     View Orders
+                  </button>
+                </div>
+                
+                <div className="spice-grid-item">
+                  <h3 className="spice-grid-title">Financial Reports</h3>
+                  <p className="spice-grid-desc">View financial reports and sales data.</p>
+                  <button 
+                    onClick={() => navigate("/financial-reports")}
+                    className="spice-action-btn"
+                  >
+                    View Reports
                   </button>
                 </div>
               </div>
@@ -168,18 +182,30 @@ const AdminDashboard = () => {
                   <li>
                     <button
                       onClick={() => navigate("/inventory-overview")}
-                      className="spice-nav-item"
+                      className={`spice-nav-item ${
+                        location.pathname === "/inventory-overview" ? "spice-nav-active" : ""
+                      }`}
                     >
                       Inventory
                     </button>
                   </li>
                   <li>
-                    <button className="spice-nav-item">
+                    <button
+                      onClick={() => navigate("/orders")} // Assuming /orders route exists
+                      className={`spice-nav-item ${
+                        location.pathname === "/orders" ? "spice-nav-active" : ""
+                      }`}
+                    >
                       Orders
                     </button>
                   </li>
                   <li>
-                    <button className="spice-nav-item">
+                    <button
+                      onClick={() => navigate("/financial-reports")}
+                      className={`spice-nav-item ${
+                        location.pathname === "/financial-reports" ? "spice-nav-active" : ""
+                      }`}
+                    >
                       Reports
                     </button>
                   </li>
