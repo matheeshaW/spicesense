@@ -12,18 +12,13 @@ import itemRoutes from "./routes/items.js";
 import creditCardRoutes from "./routes/creditCards.js";
 import orderRoute from "./routes/order.js";
 import itemRoute from "./routes/item.js";
-import productRouter from "./routes/productRoutes.js"; // Import product routes
+import productRouter from "./routes/productSupRoutes.js"; // Import product routes
 import orderDeliveryRouter from "./routes/orderDeliveryRoutes.js";
 import shipmentDeliveryRouter from "./routes/shipmentDeliveryRoutes.js";
 import transactionRouter from "./routes/transactionRoutes.js";
 
 
-
-
-
-
 import messageRouter from "./routes/messageRoutes.js"; 
-
 
 
 dotenv.config();
