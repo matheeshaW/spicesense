@@ -67,7 +67,7 @@ const AdminDashboard = () => {
         return <AdminMessages />;
       case "deliveries":
         return <AdminDeliveries />;
-      case "transactions": // Added missing case
+      case "transactions": 
         return <AdminTransactions />;
       case "dashboard":
       default:
