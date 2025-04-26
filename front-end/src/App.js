@@ -29,6 +29,9 @@ import ExpiryAlerts from "./pages/ExpiryAlerts.js";
 import InventoryTransactions from "./pages/InventoryTransactions.js";
 import SearchFilter from "./pages/SearchFilter.js";
 import AdminProducts from "./pages/AdminProducts.js";
+import DeliveryTrackingPage from './pages/DeliveryTrackingPage';
+
+
 
 
 function App() {
@@ -68,6 +71,7 @@ function App() {
         <Route path="/inventory-transactions" element={<InventoryTransactions />}></Route>
         <Route path="/search-filter" element={<SearchFilter />}></Route>
         <Route path="/admin-products" element={<AdminProducts />}></Route>
+        <Route path="/delivery-tracking/:deliveryId" element={<DeliveryTrackingPage />} />
       </Routes>
     </Router>
     </CookiesProvider>

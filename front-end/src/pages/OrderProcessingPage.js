@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { createOrder } from '../api';
 import NavigationBar from "../components/NavigationBar";
+import '../Styles/OrderProcessing.css';
 
 const userId = sessionStorage.getItem("userId");  
 

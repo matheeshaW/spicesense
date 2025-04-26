@@ -3,6 +3,17 @@ const Order = require('../models/Order');
 const Item = require('../models/Item');
 const router = express.Router();
 
+// Get All Orders (new endpoint for admin dashboard)
+router.get('/', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching all orders:', err);
+    res.status(500).json({ message: 'Error fetching all orders', error: err.message });
+  }
+});
+
 // Get Order by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -59,37 +70,45 @@ router.post('/create', async (req, res) => {
 
 // Update Order
 router.put('/:id', async (req, res) => {
-  const { items, shippingAddress, billingAddress } = req.body;
   try {
     console.log('PUT request for order ID:', req.params.id); // Log the ID
+    console.log('Request body:', req.body); // Log the request body
+    
     const order = await Order.findById(req.params.id);
     if (!order) {
       console.log('Order not found for ID:', req.params.id);
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    if (items && items.length > 0) {
+    // Update status if provided
+    if (req.body.status) {
+      order.status = req.body.status;
+    }
+
+    // Update items if provided
+    if (req.body.items && req.body.items.length > 0) {
       let total = 0;
       const validatedItems = [];
-      for (let i = 0; i < items.length; i++) {
-        console.log('Validating item ID:', items[i].itemId); // Log each itemId
-        const item = await Item.findById(items[i].itemId);
+      for (let i = 0; i < req.body.items.length; i++) {
+        console.log('Validating item ID:', req.body.items[i].itemId); // Log each itemId
+        const item = await Item.findById(req.body.items[i].itemId);
         if (!item) {
-          return res.status(404).json({ message: `Item with ID ${items[i].itemId} not found` });
+          return res.status(404).json({ message: `Item with ID ${req.body.items[i].itemId} not found` });
         }
         validatedItems.push({
           itemId: item._id,
-          quantity: items[i].quantity,
+          quantity: req.body.items[i].quantity,
           price: item.price
         });
-        total += item.price * items[i].quantity;
+        total += item.price * req.body.items[i].quantity;
       }
       order.items = validatedItems;
       order.total = total;
     }
 
-    if (shippingAddress) order.shippingAddress = shippingAddress;
-    if (billingAddress) order.billingAddress = billingAddress;
+    // Update addresses if provided
+    if (req.body.shippingAddress) order.shippingAddress = req.body.shippingAddress;
+    if (req.body.billingAddress) order.billingAddress = req.body.billingAddress;
 
     await order.save();
     res.json({ message: 'Order updated successfully', order });
