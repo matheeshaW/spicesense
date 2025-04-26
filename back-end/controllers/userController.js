@@ -356,6 +356,7 @@ export const getUserSummaryReport = async (req, res) => {
       return res.status(403).json({ success: false, message: "Access denied. Admin only." });
     }
 
+    // Get counts
     const total = await userModel.countDocuments();
     const admins = await userModel.countDocuments({ role: "admin" });
     const suppliers = await userModel.countDocuments({ role: "supplier" });
@@ -363,6 +364,20 @@ export const getUserSummaryReport = async (req, res) => {
     const employees = await userModel.countDocuments({ role: "employee" });
     const active = await userModel.countDocuments({ isActive: true });
     const deactivated = await userModel.countDocuments({ isActive: false });
+
+    // Get detailed user data by role
+    const adminUsers = await userModel
+      .find({ role: "admin" })
+      .select("name email phone role isActive");
+    const supplierUsers = await userModel
+      .find({ role: "supplier" })
+      .select("name email phone role isActive companyName");
+    const customerUsers = await userModel
+      .find({ role: "customer" })
+      .select("name email phone role isActive shippingAddress");
+    const employeeUsers = await userModel
+      .find({ role: "employee" })
+      .select("name email phone role isActive jobTitle");
 
     const summary = {
       total,
@@ -372,6 +387,12 @@ export const getUserSummaryReport = async (req, res) => {
       employees,
       active,
       deactivated,
+      userDetails: {
+        admins: adminUsers,
+        suppliers: supplierUsers,
+        customers: customerUsers,
+        employees: employeeUsers,
+      },
     };
 
     console.log("getUserSummaryReport: Summary:", summary);
@@ -381,7 +402,6 @@ export const getUserSummaryReport = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 
 

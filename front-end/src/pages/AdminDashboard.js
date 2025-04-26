@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../Styles/AdminNav.css";
 
+
 const AdminDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
@@ -65,46 +66,152 @@ const AdminDashboard = () => {
         withCredentials: true,
       });
       console.log("User Summary Report response:", response.data);
-
+  
       if (response.data.success) {
         const { summary } = response.data;
         console.log("Summary data:", summary);
-
+  
         // Initialize jsPDF
         const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         console.log("jsPDF instance created:", doc);
-
+  
         // Verify autoTable
         if (!doc.autoTable) {
           autoTable(doc);
           console.log("autoTable applied to jsPDF instance");
         }
-
-        // Add content
+  
+        // Add header
         doc.setFontSize(18);
         doc.text("User Summary Report", 14, 20);
         doc.setFontSize(12);
         doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
         doc.text(`Admin: ${userData?.name || "Unknown"} (${userData?.email || "Unknown"})`, 14, 40);
-
-        // Define table data with fallback values
-        const tableData = [
+  
+        // Summary Table
+        doc.setFontSize(14);
+        doc.text("Summary Statistics", 14, 50);
+        const summaryTable = [
           ["Total Users", summary?.total || 0],
           ["Admins", summary?.admins || 0],
           ["Suppliers", summary?.suppliers || 0],
           ["Customers", summary?.customers || 0],
+          ["Employees", summary?.employees || 0],
           ["Active Users", summary?.active || 0],
           ["Deactivated Users", summary?.deactivated || 0],
         ];
-
-        // Add table with minimal configuration
+  
         doc.autoTable({
-          startY: 50,
+          startY: 55,
           head: [["Metric", "Count"]],
-          body: tableData,
+          body: summaryTable,
           theme: "grid",
         });
-
+  
+        // Detailed User Tables by Role
+        let currentY = doc.lastAutoTable.finalY + 10;
+  
+        // Admin Users
+        if (summary.userDetails?.admins?.length > 0) {
+          doc.setFontSize(14);
+          doc.text("Admin Users", 14, currentY);
+          doc.autoTable({
+            startY: currentY + 5,
+            head: [["Name", "Email", "Phone", "Status"]],
+            body: summary.userDetails.admins.map(user => [
+              user.name,
+              user.email,
+              user.phone,
+              user.isActive ? "Active" : "Deactivated"
+            ]),
+            theme: "grid",
+            columnStyles: {
+              0: { cellWidth: 50 },
+              1: { cellWidth: 60 },
+              2: { cellWidth: 40 },
+              3: { cellWidth: 30 },
+            },
+          });
+          currentY = doc.lastAutoTable.finalY + 10;
+        }
+  
+        // Supplier Users
+        if (summary.userDetails?.suppliers?.length > 0) {
+          doc.setFontSize(14);
+          doc.text("Supplier Users", 14, currentY);
+          doc.autoTable({
+            startY: currentY + 5,
+            head: [["Name", "Email", "Phone", "Company", "Status"]],
+            body: summary.userDetails.suppliers.map(user => [
+              user.name,
+              user.email,
+              user.phone,
+              user.companyName || "N/A",
+              user.isActive ? "Active" : "Deactivated"
+            ]),
+            theme: "grid",
+            columnStyles: {
+              0: { cellWidth: 40 },
+              1: { cellWidth: 50 },
+              2: { cellWidth: 30 },
+              3: { cellWidth: 40 },
+              4: { cellWidth: 30 },
+            },
+          });
+          currentY = doc.lastAutoTable.finalY + 10;
+        }
+  
+        // Customer Users
+        if (summary.userDetails?.customers?.length > 0) {
+          doc.setFontSize(14);
+          doc.text("Customer Users", 14, currentY);
+          doc.autoTable({
+            startY: currentY + 5,
+            head: [["Name", "Email", "Phone", "Shipping Address", "Status"]],
+            body: summary.userDetails.customers.map(user => [
+              user.name,
+              user.email,
+              user.phone,
+              user.shippingAddress || "N/A",
+              user.isActive ? "Active" : "Deactivated"
+            ]),
+            theme: "grid",
+            columnStyles: {
+              0: { cellWidth: 40 },
+              1: { cellWidth: 50 },
+              2: { cellWidth: 30 },
+              3: { cellWidth: 40 },
+              4: { cellWidth: 30 },
+            },
+          });
+          currentY = doc.lastAutoTable.finalY + 10;
+        }
+  
+        // Employee Users
+        if (summary.userDetails?.employees?.length > 0) {
+          doc.setFontSize(14);
+          doc.text("Employee Users", 14, currentY);
+          doc.autoTable({
+            startY: currentY + 5,
+            head: [["Name", "Email", "Phone", "Job Title", "Status"]],
+            body: summary.userDetails.employees.map(user => [
+              user.name,
+              user.email,
+              user.phone,
+              user.jobTitle || "N/A",
+              user.isActive ? "Active" : "Deactivated"
+            ]),
+            theme: "grid",
+            columnStyles: {
+              0: { cellWidth: 40 },
+              1: { cellWidth: 50 },
+              2: { cellWidth: 30 },
+              3: { cellWidth: 40 },
+              4: { cellWidth: 30 },
+            },
+          });
+        }
+  
         console.log("Saving PDF...");
         doc.save(`User_Summary_Report_${new Date().toISOString().split("T")[0]}.pdf`);
       } else {
@@ -119,7 +226,6 @@ const AdminDashboard = () => {
       setError(error.message || "Failed to generate report. Please try again.");
     }
   };
-
   const renderContent = () => {
     switch (activeTab) {
       case "users":
