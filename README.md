@@ -14,7 +14,7 @@ My primary responsibility was to design and implement the **Order Processing and
 - **Invoice Generation** post-payment
 - **Credit Card Management** for adding, editing, and deleting payment methods
 - **Financial Report Generation** for admin insights
-- **Order Management** with search, edit, and cancel functionalities
+- **Order Management** with search, pay funtionalies
 - **Home Pages** with home, about us, and contact us pages
 
 ---
