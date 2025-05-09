@@ -3,16 +3,6 @@ const Order = require('../models/Order');
 const Item = require('../models/Item');
 const router = express.Router();
 
-<<<<<<< Updated upstream
-// Get All Orders (new endpoint for admin dashboard)
-router.get('/', async (req, res) => {
-  try {
-    const orders = await Order.find().sort({ createdAt: -1 });
-    res.json(orders);
-  } catch (err) {
-    console.error('Error fetching all orders:', err);
-    res.status(500).json({ message: 'Error fetching all orders', error: err.message });
-=======
 // Allowed statuses for validation
 const ALLOWED_STATUSES = [
   'pending',
@@ -34,7 +24,6 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Error fetching all orders:', err);
     res.status(500).json({ message: 'Error fetching orders', error: err.message });
->>>>>>> Stashed changes
   }
 });
 
@@ -94,37 +83,16 @@ router.post('/create', async (req, res) => {
 
 // Update Order
 router.put('/:id', async (req, res) => {
-<<<<<<< Updated upstream
-  try {
-    console.log('PUT request for order ID:', req.params.id); // Log the ID
-    console.log('Request body:', req.body); // Log the request body
-    
-=======
   const { status, items, shippingAddress, billingAddress } = req.body;
   try {
     console.log('PUT request for order ID:', req.params.id, 'with data:', req.body);
 
->>>>>>> Stashed changes
     const order = await Order.findById(req.params.id);
     if (!order) {
       console.log('Order not found for ID:', req.params.id);
       return res.status(404).json({ message: 'Order not found' });
     }
 
-<<<<<<< Updated upstream
-    // Update status if provided
-    if (req.body.status) {
-      order.status = req.body.status;
-    }
-
-    // Update items if provided
-    if (req.body.items && req.body.items.length > 0) {
-      let total = 0;
-      const validatedItems = [];
-      for (let i = 0; i < req.body.items.length; i++) {
-        console.log('Validating item ID:', req.body.items[i].itemId); // Log each itemId
-        const item = await Item.findById(req.body.items[i].itemId);
-=======
     // Validate status if provided
     if (status) {
       if (!ALLOWED_STATUSES.includes(status)) {
@@ -142,29 +110,23 @@ router.put('/:id', async (req, res) => {
       for (let i = 0; i < items.length; i++) {
         console.log('Validating item ID:', items[i].itemId);
         const item = await Item.findById(items[i].itemId);
->>>>>>> Stashed changes
         if (!item) {
-          return res.status(404).json({ message: `Item with ID ${req.body.items[i].itemId} not found` });
+          return res.status(404).json({ message: `Item with ID ${items[i].itemId} not found` });
         }
         validatedItems.push({
           itemId: item._id,
-          quantity: req.body.items[i].quantity,
+          quantity: items[i].quantity,
           price: item.price
         });
-        total += item.price * req.body.items[i].quantity;
+        total += item.price * items[i].quantity;
       }
       order.items = validatedItems;
       order.total = total;
     }
 
     // Update addresses if provided
-<<<<<<< Updated upstream
-    if (req.body.shippingAddress) order.shippingAddress = req.body.shippingAddress;
-    if (req.body.billingAddress) order.billingAddress = req.body.billingAddress;
-=======
     if (shippingAddress) order.shippingAddress = shippingAddress;
     if (billingAddress) order.billingAddress = billingAddress;
->>>>>>> Stashed changes
 
     await order.save();
     const updatedOrder = await Order.findById(req.params.id).populate('items.itemId');

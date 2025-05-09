@@ -1,14 +1,3 @@
-<<<<<<< Updated upstream
-// routes/payments.js
-const express = require("express");
-const Payment = require("../models/Payment");
-const Order = require("../models/Order");
-const Item = require("../models/Item");
-const PDFDocument = require("pdfkit");
-
-const router = express.Router();
-
-=======
 
 import express from "express";
 import Payment from "../models/Payment.js";
@@ -20,7 +9,6 @@ import ExcelJS from "exceljs";
 const router = express.Router();
 
 //  save payement after paying for order
->>>>>>> Stashed changes
 router.post("/", async (req, res) => {
   try {
     console.log("Payment request body:", req.body);
@@ -74,7 +62,6 @@ router.get("/invoice/:paymentId", async (req, res) => {
       throw new Error("Card details not found in payment");
     }
 
-    // Fetch item details from the items collection
     let itemIds = [];
     if (Array.isArray(order.items)) {
       itemIds = order.items.map((item) => item.itemId);
@@ -231,9 +218,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-<<<<<<< Updated upstream
-module.exports = router;
-=======
 // financial reports route 
 router.get("/financial-reports", async (req, res) => {
   try {
@@ -569,4 +553,3 @@ router.get("/financial-report/download/:type/:period", async (req, res) => {
 });
 
 export default router;
->>>>>>> Stashed changes

@@ -297,53 +297,6 @@ const UserProfile = () => {
   return (
     <div className="profile-spiced-container">
       <NavigationBar userData={userData} />
-<<<<<<< Updated upstream
-      <div className="profile-spiced-content">
-        <div className="profile-spiced-card">
-          {userData && <h1 className="profile-spiced-title">{userData.role} Profile</h1>}
-          
-          {error && <div className="profile-spiced-error">{error}</div>}
-          {updateSuccess && <div className="profile-spiced-success">Profile updated successfully!</div>}
-          
-          {error && !userData ? (
-            <p className="profile-spiced-error-text">{error}</p>
-          ) : userData ? (
-            <>
-              {!isEditing ? (
-                <div className="profile-spiced-details">
-                  <p className="profile-spiced-detail"><strong>Name:</strong> {userData.name}</p>
-                  <p className="profile-spiced-detail"><strong>Email:</strong> {userData.email}</p>
-                  <p className="profile-spiced-detail"><strong>Phone:</strong> {userData.phone}</p>
-                  <p className="profile-spiced-detail"><strong>Role:</strong> {userData.role}</p>
-                  
-                  {renderRoleSpecificFields()}
-                  
-                  <p className="profile-spiced-detail"><strong>Email Verified:</strong> {userData.isAccountVerified ? "Yes" : "No"}</p>
-                  
-                  <div className="profile-spiced-buttons">
-                    <button
-                      onClick={handleEditClick}
-                      className="profile-spiced-edit-btn"
-                    >
-                      Edit Profile
-                    </button>
-                  </div>
-                  <Link to="/credit-cards">
-                    <button className="profile-spiced-credit-btn">
-                      Manage My Credit Cards
-                    </button>
-                  </Link>
-
-                  <Link to="/delivery-tracking">
-                    <button className="profile-spiced-credit-btn">
-                      Delivery Tracking
-                    </button>
-                  </Link>
-
-                  <OrdersList userId={userId} />
-                  
-                </div>
-=======
 
       <section className="profile-spiced-hero">
         {/* <img
@@ -469,7 +422,6 @@ const UserProfile = () => {
                     </form>
                   )}
                 </>
->>>>>>> Stashed changes
               ) : (
                 <div className="profile-spiced-loading">
                   <div className="profile-spiced-spinner"></div>

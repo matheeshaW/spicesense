@@ -1,14 +1,5 @@
 // pages/CustomerDeliveryDashboard.js
 import React, { useState, useEffect } from 'react';
-<<<<<<< Updated upstream
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import NavigationBar from "../components/NavigationBar";
-import "../Styles/DeliveryDashboard.css"; // You'll need to create this CSS file
-
-const CustomerDeliveryDashboard = () => {
-  const [deliveries, setDeliveries] = useState([]);
-=======
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import NavigationBar from "../components/NavigationBar";
@@ -16,28 +7,10 @@ import "../Styles/DeliveryDashboard.css";
 
 const CustomerDeliveryDashboard = () => {
   const [orders, setOrders] = useState([]);
->>>>>>> Stashed changes
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const navigate = useNavigate();
-<<<<<<< Updated upstream
-  
-  // Get user ID from session storage
-  const userId = sessionStorage.getItem("userId");
-  
-  useEffect(() => {
-    const fetchDeliveries = async () => {
-      try {
-        setIsLoading(true);
-        // This API endpoint would need to be implemented
-        const response = await axios.get(`http://localhost:5000/api/deliveries/user/${userId}`);
-        setDeliveries(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching deliveries:', err);
-        setError('Unable to load delivery information. Please try again later.');
-=======
   const [userData, setUserData] = useState(null);
   const location = useLocation();
   
@@ -88,28 +61,19 @@ const CustomerDeliveryDashboard = () => {
       } catch (err) {
         console.error('Error fetching orders:', err);
         setError('Unable to load order information. Please try again later.');
->>>>>>> Stashed changes
       } finally {
         setIsLoading(false);
       }
     };
 
     if (userId) {
-<<<<<<< Updated upstream
-      fetchDeliveries();
-    } else {
-      setError('Please log in to view your deliveries');
-=======
       fetchOrders();
     } else {
       setError('Please log in to view your orders');
->>>>>>> Stashed changes
       navigate('/login');
     }
   }, [userId, navigate]);
 
-<<<<<<< Updated upstream
-=======
   // Map order status to delivery status
   const getDeliveryStatus = (order) => {
     const orderDate = new Date(order.createdAt || Date.now());
@@ -145,7 +109,6 @@ const CustomerDeliveryDashboard = () => {
     deliveryNotes: 'Your order is being processed'
   }));
 
->>>>>>> Stashed changes
   // Filter deliveries based on selected status
   const filteredDeliveries = statusFilter === 'all' 
     ? deliveries 
@@ -169,13 +132,6 @@ const CustomerDeliveryDashboard = () => {
 
   // Function to format date
   const formatDate = (dateString) => {
-<<<<<<< Updated upstream
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric'
-    });
-=======
     if (!dateString) return 'Pending';
     
     try {
@@ -187,20 +143,13 @@ const CustomerDeliveryDashboard = () => {
     } catch (e) {
       return 'Invalid Date';
     }
->>>>>>> Stashed changes
   };
 
   return (
     <div>
-<<<<<<< Updated upstream
-      <NavigationBar />
-      <div className="delivery-dashboard-container">
-        <h2 className="delivery-dashboard-title">My Deliveries</h2>
-=======
       <NavigationBar userData={userData}/>
       <div className="delivery-dashboard-container">
         <h2 className="delivery-dashboard-title">My Orders & Deliveries</h2>
->>>>>>> Stashed changes
         
         {/* Status filter buttons */}
         <div className="delivery-status-filters">
@@ -238,14 +187,6 @@ const CustomerDeliveryDashboard = () => {
 
         {/* Loading and error states */}
         {isLoading ? (
-<<<<<<< Updated upstream
-          <div className="delivery-loading">Loading your deliveries...</div>
-        ) : error ? (
-          <div className="delivery-error">{error}</div>
-        ) : filteredDeliveries.length === 0 ? (
-          <div className="no-deliveries">
-            <p>No deliveries found with the selected status.</p>
-=======
           <div className="delivery-loading">Loading your order information...</div>
         ) : error ? (
           <div className="delivery-error">{error}</div>
@@ -262,7 +203,6 @@ const CustomerDeliveryDashboard = () => {
         ) : filteredDeliveries.length === 0 ? (
           <div className="no-deliveries">
             <p>No orders found with the selected status.</p>
->>>>>>> Stashed changes
           </div>
         ) : (
           <div className="deliveries-list">
@@ -277,37 +217,19 @@ const CustomerDeliveryDashboard = () => {
                 
                 <div className="delivery-details">
                   <div className="delivery-info">
-<<<<<<< Updated upstream
-                    <p><strong>Tracking Number:</strong> {delivery.trackingNumber || 'Not available yet'}</p>
-                    <p><strong>Carrier:</strong> {delivery.carrier || 'Not assigned yet'}</p>
-                    <p><strong>Estimated Delivery:</strong> {delivery.estimatedDeliveryDate 
-                      ? formatDate(delivery.estimatedDeliveryDate) 
-                      : 'Not available yet'}
-                    </p>
-                    {delivery.actualDeliveryDate && (
-                      <p><strong>Delivered On:</strong> {formatDate(delivery.actualDeliveryDate)}</p>
-                    )}
-=======
                     <p><strong>Order Date:</strong> {formatDate(delivery.createdAt)}</p>
                     <p><strong>Tracking Number:</strong> {delivery.trackingNumber || 'Not available yet'}</p>
                     <p><strong>Carrier:</strong> {delivery.carrier || 'Not assigned yet'}</p>
                     <p><strong>Estimated Delivery:</strong> {formatDate(delivery.estimatedDeliveryDate)}</p>
                     <p><strong>Shipping To:</strong> {delivery.shippingAddress}</p>
->>>>>>> Stashed changes
                   </div>
                   
                   <div className="delivery-actions">
                     <button 
                       className="view-details-btn"
-<<<<<<< Updated upstream
-                      onClick={() => navigate(`/delivery-tracking/${delivery._id}`)}
-                    >
-                      View Details
-=======
                       onClick={() => navigate(`/delivery-tracking/${delivery.orderId}`)}
                     >
                       Track Order
->>>>>>> Stashed changes
                     </button>
                   </div>
                 </div>

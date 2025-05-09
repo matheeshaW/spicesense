@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from 'react';
-<<<<<<< Updated upstream
-import { useParams, useNavigate } from 'react-router-dom';
-import { createOrder } from '../api';
-import NavigationBar from "../components/NavigationBar";
-import '../Styles/OrderProcessing.css';
-
-const userId = sessionStorage.getItem("userId");  
-=======
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { createOrder } from '../api';
 import NavigationBar from "../components/NavigationBar";
 import '../Styles/OrderProcessing.css';
 import axios from "axios";
->>>>>>> Stashed changes
 
 const OrderProcessingPage = () => {
   const { id } = useParams();

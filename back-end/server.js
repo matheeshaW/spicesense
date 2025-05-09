@@ -14,7 +14,6 @@ import itemRoutes from "./routes/items.js";
 import creditCardRoutes from "./routes/creditCards.js";
 import orderRoute from "./routes/order.js";
 import itemRoute from "./routes/item.js";
-import deliveryRoute from "./routes/delivery.js"; // New import for delivery routes
 import productRoutes from "./routes/productRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
 import deliveryRoutes from "./routes/delivery.js";
@@ -85,7 +84,6 @@ app.use("/api/items", itemRoutes);
 app.use("/api/credit-cards", creditCardRoutes);
 app.use("/api/order", orderRoute);
 app.use("/api/item", itemRoute);
-app.use("/api/deliveries", deliveryRoute); // New route for deliveries
 app.use("/api/products", productRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/stocks", stockRoutes);

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import UserManagement from "../components/UserManagement";
-<<<<<<< Updated upstream
-import AdminOrdersManagement from "../components/AdminOrdersManagement"; // Import the new component
-=======
 import AdminOrdersManagement from "../components/AdminOrdersManagement";
 import SupplierProducts from "../components/SupplierProducts";
 import AdminMessages from "../components/AdminMessages";
@@ -14,7 +11,6 @@ import FinancialReports from "../pages/FinancialReports";
 import AccountManagement from "../pages/AccountManagement"; 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
->>>>>>> Stashed changes
 import "../Styles/AdminNav.css";
 
 const AdminDashboard = () => {
@@ -238,10 +234,6 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "users":
         return <UserManagement />;
-<<<<<<< Updated upstream
-      case "orders": // New case for orders management
-        return <AdminOrdersManagement />;
-=======
       case "orders":
         return <AdminOrdersManagement />;
       case "suppliers":
@@ -256,7 +248,6 @@ const AdminDashboard = () => {
         return <FinancialReports />;
       case "account-management":
         return <AccountManagement />;
->>>>>>> Stashed changes
       case "dashboard":
       default:
         return (
@@ -265,46 +256,11 @@ const AdminDashboard = () => {
               <h2 className="spice-card-title">Dashboard Overview</h2>
               <p className="spice-welcome-text">Welcome to your admin dashboard, {userData?.name}!</p>
               <p className="spice-info-text">From here you can manage users, view reports, and control system settings.</p>
-<<<<<<< Updated upstream
-             
-=======
 
->>>>>>> Stashed changes
               <div className="spice-grid">
                 <div className="spice-grid-item">
                   <h3 className="spice-grid-title">User Management</h3>
                   <p className="spice-grid-desc">Manage users, roles, and permissions.</p>
-<<<<<<< Updated upstream
-                  <button
-                    onClick={() => switchTab("users")}
-                    className="spice-action-btn"
-                  >
-                    Manage Users
-                  </button>
-                </div>
-               
-                <div className="spice-grid-item">
-                  <h3 className="spice-grid-title">Inventory</h3>
-                  <p className="spice-grid-desc">Manage product inventory and stock levels.</p>
-                  <button
-                    onClick={() => navigate("/inventory-overview")}
-                    className="spice-action-btn"
-                  >
-                    View Inventory
-                  </button>
-                </div>
-               
-                <div className="spice-grid-item">
-                  <h3 className="spice-grid-title">Orders</h3>
-                  <p className="spice-grid-desc">View and manage customer orders.</p>
-                  <button 
-                    onClick={() => switchTab("orders")} // Updated to use switchTab
-                    className="spice-action-btn"
-                  >
-                    View Orders
-                  </button>
-                </div>
-=======
                   <button onClick={() => switchTab("users")} className="spice-action-btn">
                     Manage Users
                   </button>
@@ -373,7 +329,6 @@ const AdminDashboard = () => {
                     Manage Supplier Transactions
                   </button>
                 </div>
->>>>>>> Stashed changes
               </div>
             </div>
           </div>
@@ -414,11 +369,7 @@ const AdminDashboard = () => {
                 <p className="spice-user-name">{userData.name}</p>
                 <p className="spice-user-email">{userData.email}</p>
               </div>
-<<<<<<< Updated upstream
-             
-=======
 
->>>>>>> Stashed changes
               <nav className="spice-sidebar-nav">
                 <ul className="spice-nav-list">
                   <li>
@@ -439,9 +390,6 @@ const AdminDashboard = () => {
                   </li>
                   <li>
                     <button
-<<<<<<< Updated upstream
-                      onClick={() => switchTab("orders")}
-=======
                       onClick={() => switchTab("account-management")}
                       className={`spice-nav-item ${activeTab === "account-management" ? "spice-nav-active" : ""}`}
                     >
@@ -459,27 +407,14 @@ const AdminDashboard = () => {
                   <li>
                     <button
                       onClick={() => navigate("/inventory-overview")}
->>>>>>> Stashed changes
                       className={`spice-nav-item ${
-                        activeTab === "orders" ? "spice-nav-active" : ""
+                        location.pathname === "/inventory-overview" ? "spice-nav-active" : ""
                       }`}
-                    >
-                      Order Management
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigate("/inventory-overview")}
-                      className="spice-nav-item"
                     >
                       Inventory
                     </button>
                   </li>
                   <li>
-<<<<<<< Updated upstream
-                    <button className="spice-nav-item">
-                      Reports
-=======
                     <button
                       onClick={() => switchTab("messages")}
                       className={`spice-nav-item ${activeTab === "messages" ? "spice-nav-active" : ""}`}
@@ -517,17 +452,12 @@ const AdminDashboard = () => {
                       className="spice-nav-item"
                     >
                       Generate User Report
->>>>>>> Stashed changes
                     </button>
                   </li>
                 </ul>
               </nav>
             </div>
-<<<<<<< Updated upstream
-           
-=======
 
->>>>>>> Stashed changes
             {/* Main Content */}
             <div className="spice-content">{renderContent()}</div>
           </div>

@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-=======
 import React, { useState, useEffect } from 'react';
 import {
   fetchAllOrders,
@@ -12,7 +7,6 @@ import {
   createDelivery,
   updateDeliveryStatus
 } from '../api';
->>>>>>> Stashed changes
 import '../Styles/AdminOrdersManagement.css';
 
 const AdminOrdersManagement = () => {
@@ -26,21 +20,15 @@ const AdminOrdersManagement = () => {
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [showCreateDeliveryModal, setShowCreateDeliveryModal] = useState(false);
   const [showUpdateStatusModal, setShowUpdateStatusModal] = useState(false);
-<<<<<<< Updated upstream
-=======
   const [showDirectStatusUpdate, setShowDirectStatusUpdate] = useState(false);
   const [newStatus, setNewStatus] = useState('');
->>>>>>> Stashed changes
   const [trackingInfo, setTrackingInfo] = useState({
     trackingNumber: '',
     carrier: '',
     estimatedDeliveryDate: '',
     notes: ''
   });
-<<<<<<< Updated upstream
-=======
   const [customerName, setCustomerName] = useState('');
->>>>>>> Stashed changes
 
   useEffect(() => {
     fetchOrders();
@@ -55,17 +43,6 @@ const AdminOrdersManagement = () => {
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-<<<<<<< Updated upstream
-      // Modified to use an existing endpoint - the more generic one for fetching orders
-      const response = await axios.get('http://localhost:5000/api/order');
-      
-      console.log('Orders response:', response.data);
-      
-      // Ensure we're handling the response correctly based on its structure
-      const ordersData = Array.isArray(response.data) ? response.data : 
-                         response.data.orders ? response.data.orders : [];
-      
-=======
       const response = await fetchAllOrders();
       console.log('Orders response:', response.data);
 
@@ -75,16 +52,11 @@ const AdminOrdersManagement = () => {
         ? response.data.orders
         : [];
 
->>>>>>> Stashed changes
       setOrders(ordersData);
       setFilteredOrders(ordersData);
       setError(null);
     } catch (err) {
       console.error('Error fetching orders:', err);
-<<<<<<< Updated upstream
-      // More detailed error message for debugging
-=======
->>>>>>> Stashed changes
       const errorMessage = err.response?.data?.message || err.message;
       setError(`Failed to load orders. ${errorMessage}`);
     } finally {
@@ -103,20 +75,6 @@ const AdminOrdersManagement = () => {
   const viewOrderDetails = async (orderId) => {
     try {
       setIsLoading(true);
-<<<<<<< Updated upstream
-      const orderResponse = await axios.get(`http://localhost:5000/api/order/${orderId}`);
-      console.log('Order details response:', orderResponse.data);
-      setCurrentOrderDetail(orderResponse.data);
-
-      // Try to fetch delivery info if it exists
-      try {
-        const deliveryResponse = await axios.get(`http://localhost:5000/api/deliveries/order/${orderId}`);
-        console.log('Delivery info response:', deliveryResponse.data);
-        setDeliveryInfo(deliveryResponse.data);
-      } catch (error) {
-        console.log('No delivery found or error fetching delivery:', error.message);
-        // If no delivery exists yet, that's fine
-=======
       const orderResponse = await fetchOrder(orderId);
       console.log('Order details response:', orderResponse.data);
 
@@ -136,7 +94,6 @@ const AdminOrdersManagement = () => {
         setDeliveryInfo(deliveryData);
       } catch (error) {
         console.log('No delivery found or error fetching delivery:', error.message);
->>>>>>> Stashed changes
         setDeliveryInfo(null);
       }
 
@@ -149,11 +106,7 @@ const AdminOrdersManagement = () => {
     }
   };
 
-<<<<<<< Updated upstream
-  const createDelivery = () => {
-=======
   const createDeliveryRecord = () => {
->>>>>>> Stashed changes
     setTrackingInfo({
       trackingNumber: '',
       carrier: '',
@@ -175,23 +128,6 @@ const AdminOrdersManagement = () => {
       };
 
       console.log('Creating delivery with data:', deliveryData);
-<<<<<<< Updated upstream
-      const deliveryResponse = await axios.post('http://localhost:5000/api/deliveries/create', deliveryData);
-      console.log('Delivery creation response:', deliveryResponse.data);
-     
-      // Update order status
-      await axios.put(`http://localhost:5000/api/order/${currentOrderDetail._id}`, {
-        status: 'ready for shipment'
-      });
-
-      // Refresh data
-      fetchOrders();
-      setShowCreateDeliveryModal(false);
-     
-      // Re-fetch the current order and delivery
-      viewOrderDetails(currentOrderDetail._id);
-     
-=======
       const deliveryResponse = await createDelivery(deliveryData);
       console.log('Delivery creation response:', deliveryResponse.data);
 
@@ -203,7 +139,6 @@ const AdminOrdersManagement = () => {
       setShowCreateDeliveryModal(false);
       viewOrderDetails(currentOrderDetail._id);
 
->>>>>>> Stashed changes
       alert('Delivery created successfully!');
     } catch (err) {
       console.error('Error creating delivery:', err);
@@ -211,22 +146,6 @@ const AdminOrdersManagement = () => {
     }
   };
 
-<<<<<<< Updated upstream
-  const updateDeliveryStatus = () => {
-    setShowUpdateStatusModal(true);
-  };
-
-  const handleStatusUpdate = async (newStatus) => {
-    try {
-      // Update delivery status
-      await axios.put(`http://localhost:5000/api/deliveries/${deliveryInfo._id}/status`, {
-        status: newStatus
-      });
-     
-      // Update order status to match
-      await axios.put(`http://localhost:5000/api/order/${currentOrderDetail._id}`, {
-        status: newStatus
-=======
   const updateDeliveryStatusRecord = () => {
     setShowUpdateStatusModal(true);
   };
@@ -274,34 +193,21 @@ const AdminOrdersManagement = () => {
       console.log('Updating order:', { id: currentOrderDetail._id, status: statusToUpdate });
       await updateOrder(currentOrderDetail._id, {
         status: statusToUpdate
->>>>>>> Stashed changes
       });
 
       // Refresh data
       fetchOrders();
       setShowUpdateStatusModal(false);
-<<<<<<< Updated upstream
-     
-      // Re-fetch the current order and delivery
-      viewOrderDetails(currentOrderDetail._id);
-     
-      alert(`Status updated to: ${newStatus}`);
-    } catch (err) {
-      console.error('Error updating status:', err);
-=======
       setShowDirectStatusUpdate(false);
       viewOrderDetails(currentOrderDetail._id);
 
       alert(`Status updated to: ${statusToUpdate}`);
     } catch (err) {
       console.error('Error updating status:', err.response?.data, err.message);
->>>>>>> Stashed changes
       alert('Failed to update status: ' + (err.response?.data?.message || err.message));
     }
   };
 
-<<<<<<< Updated upstream
-=======
   const openDirectStatusUpdate = () => {
     setNewStatus(currentOrderDetail.status || 'pending');
     setShowDirectStatusUpdate(true);
@@ -316,7 +222,6 @@ const AdminOrdersManagement = () => {
     await handleStatusUpdate(newStatus);
   };
 
->>>>>>> Stashed changes
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -324,11 +229,7 @@ const AdminOrdersManagement = () => {
   return (
     <div className="admin-orders-container">
       <h2>Orders Management</h2>
-<<<<<<< Updated upstream
-     
-=======
 
->>>>>>> Stashed changes
       {/* Status filter */}
       <div className="orders-filter-section">
         <label htmlFor="status-filter">Filter by Status:</label>
@@ -345,10 +246,7 @@ const AdminOrdersManagement = () => {
           <option value="shipped">Shipped</option>
           <option value="in transit">In Transit</option>
           <option value="delivered">Delivered</option>
-<<<<<<< Updated upstream
-=======
           <option value="cancelled">Cancelled</option>
->>>>>>> Stashed changes
         </select>
       </div>
 
@@ -375,13 +273,6 @@ const AdminOrdersManagement = () => {
             {filteredOrders.map(order => (
               <tr key={order._id} className={`order-row status-${order.status?.replace(/\s+/g, '-') || 'unknown'}`}>
                 <td>{order._id.substring(0, 8)}...</td>
-<<<<<<< Updated upstream
-                <td>{order.userId ? order.userId.substring(0, 8) + '...' : 'Unknown'}</td>
-                <td>${order.total?.toFixed(2) || '0.00'}</td>
-                <td>
-                  <span className={`status-badge status-${order.status?.replace(/\s+/g, '-') || 'unknown'}`}>
-                    {order.status ? (order.status.charAt(0).toUpperCase() + order.status.slice(1)) : 'Unknown'}
-=======
                 <td>
                   {order.userId && typeof order.userId === 'object' && order.userId.name
                     ? order.userId.name
@@ -393,19 +284,11 @@ const AdminOrdersManagement = () => {
                 <td>
                   <span className={`status-badge status-${order.status?.replace(/\s+/g, '-') || 'unknown'}`}>
                     {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Unknown'}
->>>>>>> Stashed changes
                   </span>
                 </td>
                 <td>{order.createdAt ? formatDate(order.createdAt) : 'N/A'}</td>
                 <td>
-<<<<<<< Updated upstream
-                  <button
-                    className="view-btn"
-                    onClick={() => viewOrderDetails(order._id)}
-                  >
-=======
                   <button className="view-btn" onClick={() => viewOrderDetails(order._id)}>
->>>>>>> Stashed changes
                     View Details
                   </button>
                 </td>
@@ -420,46 +303,6 @@ const AdminOrdersManagement = () => {
         <div className="modal-backdrop">
           <div className="modal-content">
             <div className="modal-header">
-<<<<<<< Updated upstream
-              <h3>Order Details (ID: {currentOrderDetail._id})</h3>
-              <button className="close-btn" onClick={() => setShowDetailModal(false)}>×</button>
-            </div>
-           
-            <div className="modal-body">
-              <h4>Customer Information</h4>
-              <p><strong>Customer ID:</strong> {currentOrderDetail.userId}</p>
-              <p><strong>Shipping Address:</strong> {currentOrderDetail.shippingAddress}</p>
-              <p><strong>Billing Address:</strong> {currentOrderDetail.billingAddress}</p>
-             
-              <h4>Items</h4>
-              <table className="items-table">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentOrderDetail.items.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.itemId?.name || `Item ${index + 1}`}</td>
-                      <td>{item.quantity}</td>
-                      <td>${item.price?.toFixed(2) || '0.00'}</td>
-                      <td>${(item.price * item.quantity).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-             
-              <div className="order-summary">
-                <p><strong>Total:</strong> ${currentOrderDetail.total?.toFixed(2) || '0.00'}</p>
-                <p><strong>Status:</strong> {currentOrderDetail.status}</p>
-              </div>
-             
-              {/* Delivery Information (if exists) */}
-=======
               <h3>Order Details (ID: {currentOrderDetail._id.substring(0, 8)}...)</h3>
               <button className="close-btn" onClick={() => setShowDetailModal(false)}>×</button>
             </div>
@@ -534,7 +377,6 @@ const AdminOrdersManagement = () => {
                 )}
               </div>
 
->>>>>>> Stashed changes
               {deliveryInfo ? (
                 <div className="delivery-info-section">
                   <h4>Delivery Information</h4>
@@ -542,19 +384,10 @@ const AdminOrdersManagement = () => {
                   <p><strong>Tracking Number:</strong> {deliveryInfo.trackingNumber || 'Not available'}</p>
                   <p><strong>Carrier:</strong> {deliveryInfo.carrier || 'Not specified'}</p>
                   <p>
-<<<<<<< Updated upstream
-                    <strong>Estimated Delivery:</strong>
-                    {deliveryInfo.estimatedDeliveryDate ? formatDate(deliveryInfo.estimatedDeliveryDate) : 'Not set'}
-                  </p>
-                  {deliveryInfo.deliveryNotes && (
-                    <p><strong>Notes:</strong> {deliveryInfo.deliveryNotes}</p>
-                  )}
-=======
                     <strong>Estimated Delivery:</strong>{' '}
                     {deliveryInfo.estimatedDeliveryDate ? formatDate(deliveryInfo.estimatedDeliveryDate) : 'Not set'}
                   </p>
                   {deliveryInfo.deliveryNotes && <p><strong>Notes:</strong> {deliveryInfo.deliveryNotes}</p>}
->>>>>>> Stashed changes
                 </div>
               ) : (
                 <div className="no-delivery-info">
@@ -562,22 +395,6 @@ const AdminOrdersManagement = () => {
                 </div>
               )}
             </div>
-<<<<<<< Updated upstream
-           
-            <div className="modal-footer">
-              {currentOrderDetail.status === 'paid' && !deliveryInfo && (
-                <button className="ready-shipment-btn" onClick={createDelivery}>
-                  Mark Ready for Shipment
-                </button>
-              )}
-             
-              {deliveryInfo && (
-                <button className="update-status-btn" onClick={updateDeliveryStatus}>
-                  Update Status
-                </button>
-              )}
-             
-=======
 
             <div className="modal-footer">
               {currentOrderDetail.status === 'paid' && !deliveryInfo && (
@@ -592,7 +409,6 @@ const AdminOrdersManagement = () => {
                 </button>
               )}
 
->>>>>>> Stashed changes
               <button className="close-modal-btn" onClick={() => setShowDetailModal(false)}>
                 Close
               </button>
@@ -601,8 +417,6 @@ const AdminOrdersManagement = () => {
         </div>
       )}
 
-<<<<<<< Updated upstream
-=======
       {/* Direct Status Update Modal */}
       {showDirectStatusUpdate && (
         <div className="modal-backdrop">
@@ -658,7 +472,6 @@ const AdminOrdersManagement = () => {
         </div>
       )}
 
->>>>>>> Stashed changes
       {/* Create Delivery Modal */}
       {showCreateDeliveryModal && (
         <div className="modal-backdrop">
@@ -667,38 +480,23 @@ const AdminOrdersManagement = () => {
               <h3>Create Delivery Record</h3>
               <button className="close-btn" onClick={() => setShowCreateDeliveryModal(false)}>×</button>
             </div>
-<<<<<<< Updated upstream
-           
-=======
 
->>>>>>> Stashed changes
             <div className="modal-body">
               <div className="form-group">
                 <label>Tracking Number</label>
                 <input
                   type="text"
                   value={trackingInfo.trackingNumber}
-<<<<<<< Updated upstream
-                  onChange={(e) => setTrackingInfo({...trackingInfo, trackingNumber: e.target.value})}
-                />
-              </div>
-             
-=======
                   onChange={(e) => setTrackingInfo({ ...trackingInfo, trackingNumber: e.target.value })}
                   placeholder="Enter tracking number"
                 />
               </div>
 
->>>>>>> Stashed changes
               <div className="form-group">
                 <label>Carrier</label>
                 <select
                   value={trackingInfo.carrier}
-<<<<<<< Updated upstream
-                  onChange={(e) => setTrackingInfo({...trackingInfo, carrier: e.target.value})}
-=======
                   onChange={(e) => setTrackingInfo({ ...trackingInfo, carrier: e.target.value })}
->>>>>>> Stashed changes
                 >
                   <option value="">Select a carrier</option>
                   <option value="UPS">UPS</option>
@@ -707,40 +505,20 @@ const AdminOrdersManagement = () => {
                   <option value="DHL">DHL</option>
                 </select>
               </div>
-<<<<<<< Updated upstream
-             
-=======
 
->>>>>>> Stashed changes
               <div className="form-group">
                 <label>Estimated Delivery Date</label>
                 <input
                   type="date"
                   value={trackingInfo.estimatedDeliveryDate}
-<<<<<<< Updated upstream
-                  onChange={(e) => setTrackingInfo({...trackingInfo, estimatedDeliveryDate: e.target.value})}
-                />
-              </div>
-             
-=======
                   onChange={(e) => setTrackingInfo({ ...trackingInfo, estimatedDeliveryDate: e.target.value })}
                 />
               </div>
 
->>>>>>> Stashed changes
               <div className="form-group">
                 <label>Notes</label>
                 <textarea
                   value={trackingInfo.notes}
-<<<<<<< Updated upstream
-                  onChange={(e) => setTrackingInfo({...trackingInfo, notes: e.target.value})}
-                />
-              </div>
-            </div>
-           
-            <div className="modal-footer">
-              <button className="create-btn" onClick={handleCreateDelivery}>
-=======
                   onChange={(e) => setTrackingInfo({ ...trackingInfo, notes: e.target.value })}
                   placeholder="Add any special delivery instructions or notes"
                 />
@@ -753,7 +531,6 @@ const AdminOrdersManagement = () => {
                 onClick={handleCreateDelivery}
                 disabled={!trackingInfo.trackingNumber || !trackingInfo.carrier}
               >
->>>>>>> Stashed changes
                 Create Delivery
               </button>
               <button className="cancel-btn" onClick={() => setShowCreateDeliveryModal(false)}>
@@ -772,13 +549,6 @@ const AdminOrdersManagement = () => {
               <h3>Update Delivery Status</h3>
               <button className="close-btn" onClick={() => setShowUpdateStatusModal(false)}>×</button>
             </div>
-<<<<<<< Updated upstream
-           
-            <div className="modal-body">
-              <p>Current Status: <strong>{deliveryInfo?.status}</strong></p>
-              <p>Select the new status:</p>
-             
-=======
 
             <div className="modal-body">
               <p>
@@ -786,7 +556,6 @@ const AdminOrdersManagement = () => {
               </p>
               <p>Select the new status:</p>
 
->>>>>>> Stashed changes
               <div className="status-buttons">
                 {deliveryInfo?.status !== 'ready for shipment' && (
                   <button
@@ -796,32 +565,6 @@ const AdminOrdersManagement = () => {
                     Ready for Shipment
                   </button>
                 )}
-<<<<<<< Updated upstream
-               
-                {deliveryInfo?.status !== 'shipped' && (
-                  <button
-                    className="status-btn shipped-btn"
-                    onClick={() => handleStatusUpdate('shipped')}
-                  >
-                    Shipped
-                  </button>
-                )}
-               
-                {deliveryInfo?.status !== 'in transit' && (
-                  <button
-                    className="status-btn transit-btn"
-                    onClick={() => handleStatusUpdate('in transit')}
-                  >
-                    In Transit
-                  </button>
-                )}
-               
-                {deliveryInfo?.status !== 'delivered' && (
-                  <button
-                    className="status-btn delivered-btn"
-                    onClick={() => handleStatusUpdate('delivered')}
-                  >
-=======
 
                 {deliveryInfo?.status !== 'shipped' && (
                   <button className="status-btn shipped-btn" onClick={() => handleStatusUpdate('shipped')}>
@@ -837,17 +580,12 @@ const AdminOrdersManagement = () => {
 
                 {deliveryInfo?.status !== 'delivered' && (
                   <button className="status-btn delivered-btn" onClick={() => handleStatusUpdate('delivered')}>
->>>>>>> Stashed changes
                     Delivered
                   </button>
                 )}
               </div>
             </div>
-<<<<<<< Updated upstream
-           
-=======
 
->>>>>>> Stashed changes
             <div className="modal-footer">
               <button className="cancel-btn" onClick={() => setShowUpdateStatusModal(false)}>
                 Cancel
@@ -860,8 +598,4 @@ const AdminOrdersManagement = () => {
   );
 };
 
-<<<<<<< Updated upstream
 export default AdminOrdersManagement;
-=======
-export default AdminOrdersManagement;
->>>>>>> Stashed changes

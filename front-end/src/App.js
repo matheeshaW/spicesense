@@ -29,16 +29,10 @@ import ExpiryAlerts from "./pages/ExpiryAlerts.js";
 import InventoryTransactions from "./pages/InventoryTransactions.js";
 import SearchFilter from "./pages/SearchFilter.js";
 import AdminProducts from "./pages/AdminProducts.js";
-<<<<<<< Updated upstream
-import DeliveryTrackingPage from './pages/DeliveryTrackingPage';
-
-
-=======
 import FinancialReports from "./pages/FinancialReports.js"; // Added
 import AccountManagement from "./pages/AccountManagement"; 
 import DeliveryTrackingPage from './pages/DeliveryTrackingPage';
 import CustomerDeliveryDashboard from './pages/CustomerDeliveryDashboard';
->>>>>>> Stashed changes
 
 
 function App() {
@@ -78,16 +72,12 @@ function App() {
         <Route path="/inventory-transactions" element={<InventoryTransactions />}></Route>
         <Route path="/search-filter" element={<SearchFilter />}></Route>
         <Route path="/admin-products" element={<AdminProducts />}></Route>
-<<<<<<< Updated upstream
-        <Route path="/delivery-tracking/:deliveryId" element={<DeliveryTrackingPage />} />
-=======
         <Route path="/financial-reports" element={<FinancialReports />} /> 
         <Route path="/account-management" element={<AccountManagement />} />
         <Route path="/delivery-tracking/:deliveryId" element={<DeliveryTrackingPage />} />
         <Route path="/deliveries" element={<CustomerDeliveryDashboard />} />
   
 
->>>>>>> Stashed changes
       </Routes>
     </Router>
     </CookiesProvider>
