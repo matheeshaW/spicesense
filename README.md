@@ -72,3 +72,28 @@ My primary responsibility was to design and implement the **Order Processing and
 - 🧪 Final testing and UI refinements in progress
 
 ---
+
+## ⭐ Since there's still no function have made to add the products to the home page, here are some json documents in item collection(spice items):
+
+
+[
+  {
+    "_id": { "$oid": "65fa3b4a8e9b3f1a2c222223" },
+    "name": "Chilli Pieces",
+    "category": "Spices",
+    "price": { "$numberDouble": "5.0" },
+    "stock": { "$numberInt": "100" },
+    "expiryDate": "2025-11-15"
+  },
+  {
+    "_id": { "$oid": "65fa3b4a8e9b3f1a2c222224" },
+    "name": "Chilli Powder",
+    "category": "Spices",
+    "price": { "$numberDouble": "4.8" },
+    "stock": { "$numberInt": "90" },
+    "expiryDate": "2025-10-20"
+  }
+  
+]
+
+---
