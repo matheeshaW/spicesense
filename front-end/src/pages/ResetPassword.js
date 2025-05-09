@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../Styles/spice-otp-styles.css';
+
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,26 @@ const ResetPassword = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Set email from location.state or localStorage on component mount
+  useEffect(() => {
+    console.log('Location state:', location.state);
+    console.log('Current pathname:', location.pathname);
+    const storedEmail = localStorage.getItem('resetEmail');
+    console.log('Stored email from localStorage:', storedEmail);
+
+    if (location.state?.email) {
+      setEmail(location.state.email);
+      console.log('Email set from state:', location.state.email);
+    } else if (storedEmail) {
+      setEmail(storedEmail);
+      console.log('Email set from localStorage:', storedEmail);
+    } else if (location.pathname !== '/send-reset-otp') {
+      console.log('No email provided, redirecting to /send-reset-otp');
+      navigate('/send-reset-otp', { replace: true });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const handleConfirmPasswordChange = (e) => {
     const value = e.target.value;
@@ -51,6 +72,7 @@ const ResetPassword = () => {
         newPassword,
       });
       if (response.data.success) {
+        localStorage.removeItem('resetEmail'); // Clean up localStorage
         alert('Password reset successfully!');
         navigate('/login');
       }
@@ -63,15 +85,23 @@ const ResetPassword = () => {
   };
 
   return (
+    <div className="spicesense-page">
+      {/* Header */}
+      <header className="spicesense-header">
+        <div className="spicesense-logo">
+          <span>SpiceSense</span>
+        </div>
+      </header>
+
     <div className="spice-page-container">
       <div className="spice-form-card">
         <div className="spice-header">
           <h1 className="spice-title">Reset Password</h1>
           <p className="spice-subtitle">Enter your information to reset your password</p>
         </div>
-        
+
         {error && <div className="spice-message spice-message-error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className="spice-form">
           <div className="spice-input-group">
             <label htmlFor="email" className="spice-label">Email Address</label>
@@ -82,10 +112,11 @@ const ResetPassword = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              readOnly={!!(location.state?.email || localStorage.getItem('resetEmail'))} // Read-only if email is passed
               className="spice-input"
             />
           </div>
-          
+
           <div className="spice-input-group">
             <label className="spice-label">OTP Code</label>
             <div className="spice-otp-container">
@@ -102,7 +133,7 @@ const ResetPassword = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="spice-input-group">
             <label htmlFor="newPassword" className="spice-label">New Password</label>
             <input
@@ -115,7 +146,7 @@ const ResetPassword = () => {
               className="spice-input"
             />
           </div>
-          
+
           <div className="spice-input-group">
             <label htmlFor="confirmPassword" className="spice-label">Confirm New Password</label>
             <input
@@ -129,12 +160,13 @@ const ResetPassword = () => {
             />
             {!passwordMatch && <p className="spice-error-text">Passwords do not match</p>}
           </div>
-          
+
           <button type="submit" disabled={loading || !passwordMatch} className="spice-button">
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 };

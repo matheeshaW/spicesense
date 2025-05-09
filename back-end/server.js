@@ -17,6 +17,17 @@ import itemRoute from "./routes/item.js";
 import deliveryRoute from "./routes/delivery.js"; // New import for delivery routes
 import productRoutes from "./routes/productRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
+import deliveryRoutes from "./routes/delivery.js";
+
+
+
+import productRouter from "./routes/productSupRoutes.js";
+import orderDeliveryRouter from "./routes/orderDeliveryRoutes.js";
+import shipmentDeliveryRouter from "./routes/shipmentDeliveryRoutes.js";
+import transactionRouter from "./routes/transactionRoutes.js";
+import messageRouter from "./routes/messageRoutes.js";
+
+
 
 dotenv.config();
 
@@ -77,6 +88,16 @@ app.use("/api/item", itemRoute);
 app.use("/api/deliveries", deliveryRoute); // New route for deliveries
 app.use("/api/products", productRoutes);
 app.use("/api/stocks", stockRoutes);
+app.use("/api/stocks", stockRoutes);
+app.use("/api/delivery", deliveryRoutes);
+
+
+app.use("/api/supProducts", productRouter);
+app.use("/api/messages", messageRouter);
+app.use("/api/orderdelivers", orderDeliveryRouter);
+app.use("/api/deliveries", shipmentDeliveryRouter);
+app.use("/api/transactions", transactionRouter);
+
 
 // Test Cookie Endpoint
 app.get("/api/test-cookie", (req, res) => {

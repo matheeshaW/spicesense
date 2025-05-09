@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Stock = require("../models/Stock");
 const Product = require("../models/Product");
 const Transaction = require("../models/Transaction");
@@ -8,24 +9,25 @@ const Transaction = require("../models/Transaction");
 // fetch stock data
 router.get("/inventory", async (req, res) => {
     try {
-
         const today = new Date();
         const stockData = await Stock.find().populate("product", "productName category");
 
-        const formattedData = stockData.map(stock => {
+        const filteredStockData = stockData.filter(stock => stock.product);
+
+        const formattedData = filteredStockData.map(stock => {
             const expiredBatches = stock.batches
-                .filter(batch => new Date(batch.expiryDate) < today) 
+                .filter(batch => new Date(batch.expiryDate) < today)
                 .map(batch => ({
                     batchNumber: batch.batchNumber,
-                    name: stock.product?.productName,
+                    name: stock.product?.productName || "Unknown"
                 }));
 
             return {
                 id: stock._id,
-                name: stock.product?.productName,
-                category: stock.product.category,
+                name: stock.product?.productName || "Unknown",
+                category: stock.product?.category || "Unknown",
                 quantity: stock.totalQuantity || stock.batches.reduce((acc, batch) => acc + batch.quantity, 0),
-                expiredBatches // Store expired batch details
+                expiredBatches
             };
         });
 
@@ -34,12 +36,15 @@ router.get("/inventory", async (req, res) => {
         console.error("Error fetching inventory data:", error);
         res.status(500).json({ message: "Server error" });
     }
-})
+});
+
 
 // Get all stock levels
 router.get("/", async (req, res) => {
     try {
+
         const stocks = await Stock.find().populate("product");
+
         res.json(stocks);
     } catch (error) {
         res.status(500).json({ message: "Error fetching stock levels", error });
@@ -73,7 +78,7 @@ router.post("/add", async (req, res) => {
 
         const nextBatchNumber = `B-${highestBatchNumber + 1}`;
 
-        
+
         stock.batches.push({ batchNumber: nextBatchNumber, expiryDate, quantity: Number(quantity) });
         stock.totalQuantity += Number(quantity);
 
@@ -112,7 +117,7 @@ router.put("/edit/:stockId/:batchNumber", async (req, res) => {
         batch.expiryDate = expiryDate;
         batch.quantity = Number(quantity);
 
-        
+
         stock.totalQuantity = stock.batches.reduce((sum, b) => sum + b.quantity, 0);
 
         await stock.save();
@@ -128,18 +133,30 @@ router.delete("/delete/:stockId/:batchNumber", async (req, res) => {
     try {
         const { stockId, batchNumber } = req.params;
 
-        let stock = await Stock.findById(stockId);
-        if (!stock) return res.status(404).json({ message: "Stock not found" });
 
+        if (!mongoose.Types.ObjectId.isValid(stockId)) {
+            return res.status(400).json({ message: "Invalid stock ID" });
+        }
+
+        let stock = await Stock.findById(stockId);
+        if (!stock) {
+            return res.status(404).json({ message: "Stock not found" });
+        }
+
+        const originalLength = stock.batches.length;
         stock.batches = stock.batches.filter(batch => batch.batchNumber !== batchNumber);
 
-        
-        stock.totalQuantity = stock.batches.reduce((sum, b) => sum + b.quantity, 0);
+        if (stock.batches.length === originalLength) {
+            return res.status(404).json({ message: "Batch not found" });
+        }
 
+        stock.totalQuantity = stock.batches.reduce((sum, b) => sum + b.quantity, 0);
         await stock.save();
+
         res.json({ message: "Batch deleted successfully", stock });
-        
+
     } catch (error) {
+        console.error("Error deleting batch:", error);
         res.status(400).json({ message: "Error deleting batch", error });
     }
 });
@@ -149,7 +166,7 @@ router.delete("/delete/:stockId/:batchNumber", async (req, res) => {
 router.post("/sell", async (req, res) => {
     try {
         const { soldProductId, soldQuantity } = req.body;
-        const quantityToDeduct = parseInt(soldQuantity);
+        const quantityToDeduct = soldQuantity;
 
         const stock = await Stock.findOne({ product: soldProductId }).populate("product");
         if (!stock) return res.status(404).json({ message: "Stock not found" });
@@ -203,6 +220,7 @@ router.post("/sell", async (req, res) => {
 router.get("/transactions", async (req, res) => {
     try {
         const transactions = await Transaction.find().populate("product", "productName category");
+
         res.json(transactions);
     } catch (error) {
         res.status(500).json({ message: "Error fetching transactions", error });
@@ -215,14 +233,14 @@ router.get("/transactions", async (req, res) => {
 router.get("/expiry", async (req, res) => {
     try {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);  
+        today.setHours(0, 0, 0, 0);
 
         const allItems = await Stock.find().populate("product", "productName category");
 
         const sortedItems = allItems.flatMap(item => {
             if (!Array.isArray(item.batches)) {
                 console.warn(`Item ${item._id} has no valid batches.`);
-                return [];  
+                return [];
             }
 
             return item.batches.map(batch => {
@@ -231,7 +249,7 @@ router.get("/expiry", async (req, res) => {
                 }
 
                 const expiry = new Date(batch.expiryDate);
-                expiry.setHours(0, 0, 0, 0);  
+                expiry.setHours(0, 0, 0, 0);
 
                 const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
                 let status;
@@ -243,7 +261,7 @@ router.get("/expiry", async (req, res) => {
                 return {
                     batchNo: batch.batchNumber || "Unknown",
                     name: item.product?.productName || "Unknown",
-                    expiryDate: expiry.toISOString().split("T")[0], 
+                    expiryDate: expiry.toISOString().split("T")[0],
                     status
                 };
             });
@@ -263,7 +281,7 @@ router.get("/expiry", async (req, res) => {
 
 
 
-// Fetch stock data with batch details for filtering
+// Fetch stock data with batch details
 router.get("/searchFilter", async (req, res) => {
     try {
         const stockData = await Stock.find().populate("product", "productName category");

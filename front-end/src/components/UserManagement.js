@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Loading from './Loading';
-import '../Styles/UserManagement.css'; 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Loading from "./Loading";
+import "../Styles/UserManagement.css";
+
 const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
   if (!isOpen) return null;
 
@@ -33,30 +34,32 @@ const UserManagement = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedRole, setSelectedRole] = useState('all');
+  const [selectedRole, setSelectedRole] = useState("all");
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false); // New state for create form
   const [currentUser, setCurrentUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    role: '',
-    password: '',
-    companyName: '',
-    contactPerson: '',
-    jobTitle: '',
-    department: '',
-    shippingAddress: '',
-    billingAddress: ''
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    password: "",
+    companyName: "",
+    contactPerson: "",
+    jobTitle: "",
+    department: "",
+    shippingAddress: "",
+    billingAddress: "",
   });
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [createSuccess, setCreateSuccess] = useState(false); // New state for create success
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
-    title: '',
-    message: '',
-    userId: null
+    title: "",
+    message: "",
+    userId: null,
   });
 
   // Fetch users based on selected role
@@ -65,41 +68,47 @@ const UserManagement = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         let response;
-        if (selectedRole === 'all') {
-          response = await axios.get('http://localhost:5000/api/user/all', { withCredentials: true });
+        if (selectedRole === "all") {
+          response = await axios.get("http://localhost:5000/api/user/all", {
+            withCredentials: true,
+          });
         } else {
-          response = await axios.get(`http://localhost:5000/api/user/role/${selectedRole}`, { withCredentials: true });
+          response = await axios.get(`http://localhost:5000/api/user/role/${selectedRole}`, {
+            withCredentials: true,
+          });
         }
-        
+
         if (response.data.success) {
-          setUsers(response.data.users);
-          setFilteredUsers(response.data.users);
+          setUsers(response.data.users || []);
+          setFilteredUsers(response.data.users || []);
         } else {
-          setError(response.data.message);
+          setError(response.data.message || "Failed to fetch users");
         }
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch users');
-        console.error('Error fetching users:', err);
+        const errorMessage = err.response?.data?.message || "Failed to fetch users";
+        setError(errorMessage);
+        console.error("Error fetching users:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, [selectedRole, updateSuccess, deleteSuccess]);
+  }, [selectedRole, updateSuccess, deleteSuccess, createSuccess]);
 
   // Filter users based on search term
   useEffect(() => {
-    if (searchTerm.trim() === '') {
+    if (searchTerm.trim() === "") {
       setFilteredUsers(users);
     } else {
       const lowercasedTerm = searchTerm.toLowerCase();
-      const results = users.filter(user => 
-        user.name?.toLowerCase().includes(lowercasedTerm) || 
-        user.email?.toLowerCase().includes(lowercasedTerm) || 
-        user.phone?.toLowerCase().includes(lowercasedTerm)
+      const results = users.filter(
+        (user) =>
+          user.name?.toLowerCase().includes(lowercasedTerm) ||
+          user.email?.toLowerCase().includes(lowercasedTerm) ||
+          user.phone?.toLowerCase().includes(lowercasedTerm)
       );
       setFilteredUsers(results);
     }
@@ -112,42 +121,58 @@ const UserManagement = () => {
 
   // Clear search
   const handleClearSearch = () => {
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   // Handle role selection
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
-    setSearchTerm(''); // Clear search when changing roles
+    setSearchTerm("");
   };
 
   // Open update form with user data
   const handleUpdateClick = (user) => {
     setCurrentUser(user);
-    
     setFormData({
-      name: user.name || '',
-      email: user.email || '',
-      phone: user.phone || '',
-      role: user.role || '',
-      password: '',
-      companyName: user.companyName || '',
-      contactPerson: user.contactPerson || '',
-      jobTitle: user.jobTitle || '',
-      department: user.department || '',
-      shippingAddress: user.shippingAddress || '',
-      billingAddress: user.billingAddress || ''
+      name: user.name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+      role: user.role || "",
+      password: "",
+      companyName: user.companyName || "",
+      contactPerson: user.contactPerson || "",
+      jobTitle: user.jobTitle || "",
+      department: user.department || "",
+      shippingAddress: user.shippingAddress || "",
+      billingAddress: user.billingAddress || "",
     });
-    
     setShowUpdateForm(true);
+  };
+
+  // Open create form
+  const handleCreateClick = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      role: "",
+      password: "",
+      companyName: "",
+      contactPerson: "",
+      jobTitle: "",
+      department: "",
+      shippingAddress: "",
+      billingAddress: "",
+    });
+    setShowCreateForm(true);
   };
 
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -156,34 +181,74 @@ const UserManagement = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      
+      setError(null);
+
       const updateData = {};
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== '') {
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== "") {
           updateData[key] = formData[key];
         }
       });
-      
+
       if (!updateData.password) {
         delete updateData.password;
       }
-      
+
       const response = await axios.put(
         `http://localhost:5000/api/user/update/${currentUser._id}`,
         updateData,
         { withCredentials: true }
       );
-      
+
       if (response.data.success) {
         setUpdateSuccess(true);
         setTimeout(() => setUpdateSuccess(false), 3000);
         setShowUpdateForm(false);
       } else {
-        setError(response.data.message);
+        setError(response.data.message || "Failed to update user");
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update user');
-      console.error('Error updating user:', err);
+      const errorMessage = err.response?.data?.message || "Failed to update user";
+      setError(errorMessage);
+      console.error("Error updating user:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Submit create form
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(null);
+
+      const createData = { ...formData };
+
+      // Remove empty fields that are not required
+      Object.keys(createData).forEach((key) => {
+        if (createData[key] === "" && key !== "password") {
+          delete createData[key];
+        }
+      });
+
+      const response = await axios.post(
+        "http://localhost:5000/api/user/create-user",
+        createData,
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        setCreateSuccess(true);
+        setTimeout(() => setCreateSuccess(false), 3000);
+        setShowCreateForm(false);
+      } else {
+        setError(response.data.message || "Failed to create user");
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "Failed to create user";
+      setError(errorMessage);
+      console.error("Error creating user:", err);
     } finally {
       setLoading(false);
     }
@@ -191,48 +256,75 @@ const UserManagement = () => {
 
   // Open delete confirmation dialog
   const openDeleteDialog = (userId) => {
+    if (!userId) {
+      setError("Invalid user ID");
+      return;
+    }
+    console.log("Opening delete dialog for userId:", userId);
     setConfirmDialog({
       isOpen: true,
-      title: 'Confirm Delete',
-      message: 'Are you sure you want to delete this user? This action cannot be undone.',
-      userId
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this user? This action cannot be undone.",
+      userId,
     });
   };
 
   // Handle delete user
   const handleDeleteUser = async () => {
+    if (!confirmDialog.userId) {
+      setError("No user selected for deletion");
+      setConfirmDialog({ ...confirmDialog, isOpen: false });
+      return;
+    }
+
     try {
       setLoading(true);
-      
+      setError(null);
+
       const response = await axios.delete(
         `http://localhost:5000/api/user/delete/${confirmDialog.userId}`,
         { withCredentials: true }
       );
-      
+
       if (response.data.success) {
         setDeleteSuccess(true);
         setTimeout(() => setDeleteSuccess(false), 3000);
       } else {
-        setError(response.data.message);
+        setError(response.data.message || "Failed to delete user");
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete user');
-      console.error('Error deleting user:', err);
+      const errorMessage = err.response?.data?.message || "Failed to delete user";
+      setError(errorMessage);
+      console.error("Error deleting user:", err);
     } finally {
       setLoading(false);
       setConfirmDialog({ ...confirmDialog, isOpen: false });
     }
   };
 
-  // Close update form
+  // Close forms
   const handleCloseForm = () => {
     setShowUpdateForm(false);
+    setShowCreateForm(false);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      role: "",
+      password: "",
+      companyName: "",
+      contactPerson: "",
+      jobTitle: "",
+      department: "",
+      shippingAddress: "",
+      billingAddress: "",
+    });
   };
 
   // Get role-specific fields
   const getRoleSpecificFields = () => {
     switch (formData.role) {
-      case 'supplier':
+      case "supplier":
         return (
           <>
             <div className="ginger-form-group">
@@ -246,7 +338,7 @@ const UserManagement = () => {
               />
             </div>
             <div className="ginger-form-group">
-              <label className="ginger-label">Contact Person</label>
+              <label className="ginger-label">Warehouse Location</label>
               <input
                 type="text"
                 name="contactPerson"
@@ -257,7 +349,7 @@ const UserManagement = () => {
             </div>
           </>
         );
-      case 'employee':
+      case "employee":
         return (
           <>
             <div className="ginger-form-group">
@@ -282,7 +374,7 @@ const UserManagement = () => {
             </div>
           </>
         );
-      case 'customer':
+      case "customer":
         return (
           <>
             <div className="ginger-form-group">
@@ -315,7 +407,14 @@ const UserManagement = () => {
   return (
     <div className="ginger-container">
       <h2 className="ginger-title">User Management</h2>
-      
+
+      {/* Create New User Button */}
+      <div className="ginger-create-button-container">
+        <button onClick={handleCreateClick} className="ginger-create-btn">
+          Create New User
+        </button>
+      </div>
+
       <div className="ginger-search-container">
         <input
           type="text"
@@ -325,49 +424,47 @@ const UserManagement = () => {
           className="ginger-search-input"
         />
         {searchTerm && (
-          <button onClick={handleClearSearch} className="ginger-clear-btn">×</button>
+          <button onClick={handleClearSearch} className="ginger-clear-btn">
+            ×
+          </button>
         )}
       </div>
 
       {/* Role filter tabs */}
       <div className="ginger-tabs">
         <button
-          onClick={() => handleRoleSelect('all')}
-          className={`ginger-tab ${selectedRole === 'all' ? 'ginger-tab-active' : ''}`}
+          onClick={() => handleRoleSelect("all")}
+          className={`ginger-tab ${selectedRole === "all" ? "ginger-tab-active" : ""}`}
         >
           All Users
         </button>
         <button
-          onClick={() => handleRoleSelect('admin')}
-          className={`ginger-tab ${selectedRole === 'admin' ? 'ginger-tab-active' : ''}`}
+          onClick={() => handleRoleSelect("admin")}
+          className={`ginger-tab ${selectedRole === "admin" ? "ginger-tab-active" : ""}`}
         >
           Admins
         </button>
         <button
-          onClick={() => handleRoleSelect('supplier')}
-          className={`ginger-tab ${selectedRole === 'supplier' ? 'ginger-tab-active' : ''}`}
+          onClick={() => handleRoleSelect("supplier")}
+          className={`ginger-tab ${selectedRole === "supplier" ? "ginger-tab-active" : ""}`}
         >
           Suppliers
         </button>
         <button
-          onClick={() => handleRoleSelect('customer')}
-          className={`ginger-tab ${selectedRole === 'customer' ? 'ginger-tab-active' : ''}`}
+          onClick={() => handleRoleSelect("customer")}
+          className={`ginger-tab ${selectedRole === "customer" ? "ginger-tab-active" : ""}`}
         >
           Customers
         </button>
-        <button
-          onClick={() => handleRoleSelect('employee')}
-          className={`ginger-tab ${selectedRole === 'employee' ? 'ginger-tab-active' : ''}`}
-        >
-          Employees
-        </button>
+       
       </div>
-      
+
       {/* Status messages */}
       {error && <div className="ginger-error">{error}</div>}
       {updateSuccess && <div className="ginger-success">User updated successfully!</div>}
       {deleteSuccess && <div className="ginger-success">User deleted successfully!</div>}
-      
+      {createSuccess && <div className="ginger-success">User created successfully!</div>}
+
       {/* User Table */}
       {loading ? (
         <Loading message="Loading users..." />
@@ -388,41 +485,50 @@ const UserManagement = () => {
               {filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="ginger-no-results">
-                    {searchTerm ? 'No users found matching your search' : 'No users found'}
+                    {searchTerm ? "No users found matching your search" : "No users found"}
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map(user => (
+                filteredUsers.map((user) => (
                   <tr key={user._id} className="ginger-table-row">
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone}</td>
-                    <td className="capitalize">{user.role}</td>
+                    <td>{user.name || "N/A"}</td>
+                    <td>{user.email || "N/A"}</td>
+                    <td>{user.phone || "N/A"}</td>
+                    <td className="capitalize">{user.role || "N/A"}</td>
                     <td>
-                      {user.role === 'supplier' && (
+                      {user.role === "supplier" && (
                         <>
-                          <p><strong>Company:</strong> {user.companyName}</p>
-                          <p><strong>Contact:</strong> {user.contactPerson}</p>
+                          <p>
+                            <strong>Company:</strong> {user.companyName || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Warehouse location</strong> {user.contactPerson || "N/A"}
+                          </p>
                         </>
                       )}
-                      {user.role === 'employee' && (
+                      {user.role === "employee" && (
                         <>
-                          <p><strong>Job:</strong> {user.jobTitle}</p>
-                          <p><strong>Dept:</strong> {user.department}</p>
+                          <p>
+                            <strong>Job:</strong> {user.jobTitle || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Dept:</strong> {user.department || "N/A"}
+                          </p>
                         </>
                       )}
-                      {user.role === 'customer' && (
+                      {user.role === "customer" && (
                         <>
-                          <p><strong>Shipping:</strong> {user.shippingAddress}</p>
-                          <p><strong>Billing:</strong> {user.billingAddress}</p>
+                          <p>
+                            <strong>Shipping:</strong> {user.shippingAddress || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Billing:</strong> {user.billingAddress || "N/A"}
+                          </p>
                         </>
                       )}
                     </td>
                     <td className="ginger-actions">
-                      <button
-                        onClick={() => handleUpdateClick(user)}
-                        className="ginger-update-btn"
-                      >
+                      <button onClick={() => handleUpdateClick(user)} className="ginger-update-btn">
                         Update
                       </button>
                       <button
@@ -439,16 +545,18 @@ const UserManagement = () => {
           </table>
         </div>
       )}
-      
+
       {/* Update User Form Modal */}
       {showUpdateForm && (
         <div className="ginger-modal-overlay">
           <div className="ginger-modal">
             <div className="ginger-modal-header">
               <h3 className="ginger-modal-title">Update User</h3>
-              <button onClick={handleCloseForm} className="ginger-close-btn">×</button>
+              <button onClick={handleCloseForm} className="ginger-close-btn">
+                ×
+              </button>
             </div>
-            
+
             <form onSubmit={handleUpdateSubmit} className="ginger-form">
               <div className="ginger-form-group">
                 <label className="ginger-label">Name</label>
@@ -461,7 +569,7 @@ const UserManagement = () => {
                   required
                 />
               </div>
-              
+
               <div className="ginger-form-group">
                 <label className="ginger-label">Email</label>
                 <input
@@ -473,7 +581,7 @@ const UserManagement = () => {
                   required
                 />
               </div>
-              
+
               <div className="ginger-form-group">
                 <label className="ginger-label">Phone</label>
                 <input
@@ -485,7 +593,7 @@ const UserManagement = () => {
                   required
                 />
               </div>
-              
+
               <div className="ginger-form-group">
                 <label className="ginger-label">Password (leave blank to keep unchanged)</label>
                 <input
@@ -499,7 +607,7 @@ const UserManagement = () => {
                   Only fill this if you want to change the user's password
                 </p>
               </div>
-              
+
               <div className="ginger-form-group">
                 <label className="ginger-label">Role</label>
                 <select
@@ -513,40 +621,122 @@ const UserManagement = () => {
                   <option value="admin">Admin</option>
                   <option value="supplier">Supplier</option>
                   <option value="customer">Customer</option>
-                  <option value="employee">Employee</option>
                 </select>
               </div>
-              
+
               {getRoleSpecificFields()}
-              
+
               <div className="ginger-form-actions">
-                <button
-                  type="button"
-                  onClick={handleCloseForm}
-                  className="ginger-cancel-btn"
-                >
+                <button type="button" onClick={handleCloseForm} className="ginger-cancel-btn">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="ginger-submit-btn"
-                  disabled={loading}
-                >
-                  {loading ? 'Updating...' : 'Update User'}
+                <button type="submit" className="ginger-submit-btn" disabled={loading}>
+                  {loading ? "Updating..." : "Update User"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-      
+
+      {/* Create User Form Modal */}
+      {showCreateForm && (
+        <div className="ginger-modal-overlay">
+          <div className="ginger-modal">
+            <div className="ginger-modal-header">
+              <h3 className="ginger-modal-title">Create New User</h3>
+              <button onClick={handleCloseForm} className="ginger-close-btn">
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSubmit} className="ginger-form">
+              <div className="ginger-form-group">
+                <label className="ginger-label">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="ginger-input"
+                  required
+                />
+              </div>
+
+              <div className="ginger-form-group">
+                <label className="ginger-label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="ginger-input"
+                  required
+                />
+              </div>
+
+              <div className="ginger-form-group">
+                <label className="ginger-label">Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="ginger-input"
+                  required
+                />
+              </div>
+
+              <div className="ginger-form-group">
+                <label className="ginger-label">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="ginger-input"
+                  required
+                />
+              </div>
+
+              <div className="ginger-form-group">
+                <label className="ginger-label">Role</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  className="ginger-select"
+                  required
+                >
+                  <option value="">Select Role</option>
+                  <option value="admin">Admin</option>
+                  <option value="supplier">Supplier</option>
+                  <option value="customer">Customer</option>
+                </select>
+              </div>
+
+              {getRoleSpecificFields()}
+
+              <div className="ginger-form-actions">
+                <button type="button" onClick={handleCloseForm} className="ginger-cancel-btn">
+                  Cancel
+                </button>
+                <button type="submit" className="ginger-submit-btn" disabled={loading}>
+                  {loading ? "Creating..." : "Create User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
         title={confirmDialog.title}
         message={confirmDialog.message}
         onConfirm={handleDeleteUser}
-        onCancel={() => setConfirmDialog({...confirmDialog, isOpen: false})}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
       />
     </div>
   );
